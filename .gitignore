@@ -1,0 +1,8 @@
+# Ignore database secret
+/db/password.txt
+
+# Python venv
+.venv/
+
+# Ignore .env
+.env

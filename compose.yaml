@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h 127.0.0.1 -p 5432']
+      interval: 3s
+      retries: 5
+      start_period: 30s
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql
+    networks:
+      - backnet
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD_FILE=${POSTGRES_PASSWORD_FILE}
+      - POSTGRES_USER=${POSTGRES_USER}
+    expose:
+      - 5432
+    env_file: .env 
+
+  backend:
+    build:
+      context: backend
+      target: builder
+    restart: always
+    secrets:
+      - db-password
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+      DB_PASSWORD_FILE: /run/secrets/db-password
+      DATABASE_URL: postgresql://motivi@db:5432/calorie
+    ports:
+      - 8000:8000
+    networks:
+      - backnet
+      - frontnet
+    depends_on:
+      db:
+        condition: service_healthy
+
+  proxy:
+    build: proxy
+    restart: always
+    ports:
+      - 80:80
+    depends_on: 
+      - backend
+    networks:
+      - frontnet
+
+volumes:
+  db-data:
+
+secrets:
+  db-password:
+    file: db/password.txt
+
+networks:
+  backnet:
+  frontnet:
+  
