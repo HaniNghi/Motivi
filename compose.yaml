@@ -29,10 +29,11 @@ services:
     secrets:
       - db-password
     environment:
-      FLASK_APP: app.py
+      FLASK_APP: app/main.py
       FLASK_ENV: development
-      DB_PASSWORD_FILE: /run/secrets/db-password
-      DATABASE_URL: postgresql://motivi@db:5432/calorie
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
     ports:
       - 8000:8000
     networks:
