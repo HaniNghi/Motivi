@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 
 from flask import Flask
+from flask_cors import CORS
 
-from .database import db
-from .routes import api
+from .database import db, migrate
+from .routes import register_blueprints
 
 
 def create_app():
@@ -28,6 +29,15 @@ def create_app():
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+
     db.init_app(app)
-    app.register_blueprint(api)
+
+    migrate.init_app(app, db, directory="migrations")
+    CORS(app)
+
+    from app import models
+    from app.routes import register_blueprints
+    # from app.errors import register_error_handlers
+
+    register_blueprints(app)
     return app

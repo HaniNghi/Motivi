@@ -1,17 +1,8 @@
 
 
-from flask import Blueprint
-from sqlalchemy import text
-from app.database import db
+from .auth import auth
 
 
-api = Blueprint('api', __name__, url_prefix='/api')
-
-@api.route("/")
-def home():
-    try:
-        with db.session.connection() as conn:
-            conn.execute(text("SELECT 1"))
-        return "Hello Motivi — connected to PostgreSQL"
-    except Exception as exc:
-        return f"Hello Motivi — DB error: {exc}", 500
+def register_blueprints(app):
+    # Register each blueprint with the Flask app using the correct API
+    app.register_blueprint(auth)

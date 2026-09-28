@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
+from app.database.db import db, migrate
 
-
-db = SQLAlchemy()
+__all__= ["db", "migrate"]
