@@ -24,6 +24,6 @@ class User(db.Model):
     )
 
     profile = relationship("Profile", back_populates="user", uselist=False)
-    refresh_token = relationship("RefreshToken", back_populates="user")
+    refresh_tokens = relationship("RefreshToken", back_populates="user")
     diary_entries = relationship("DiaryEntry", back_populates="user")
     custom_foods = relationship("Food", back_populates="creator")
