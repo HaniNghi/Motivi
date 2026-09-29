@@ -17,41 +17,41 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD_FILE=${POSTGRES_PASSWORD_FILE}
       - POSTGRES_USER=${POSTGRES_USER}
-    expose:
-      - 5432
+    ports:
+      - "5432:5432"
     env_file: .env 
 
-  backend:
-    build:
-      context: backend
-      target: builder
-    restart: always
-    secrets:
-      - db-password
-    environment:
-      FLASK_APP: app/main.py
-      FLASK_ENV: development
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
-    ports:
-      - 8000:8000
-    networks:
-      - backnet
-      - frontnet
-    depends_on:
-      db:
-        condition: service_healthy
+  # backend:
+  #   build:
+  #     context: backend
+  #     target: builder
+  #   restart: always
+  #   secrets:
+  #     - db-password
+  #   environment:
+  #     FLASK_APP: app/main.py
+  #     FLASK_ENV: development
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+  #   ports:
+  #     - 8000:8000
+  #   networks:
+  #     - backnet
+  #     - frontnet
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
-  proxy:
-    build: proxy
-    restart: always
-    ports:
-      - 80:80
-    depends_on: 
-      - backend
-    networks:
-      - frontnet
+  # proxy:
+  #   build: proxy
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  #   depends_on: 
+  #     - backend
+  #   networks:
+  #     - frontnet
 
 volumes:
   db-data:
