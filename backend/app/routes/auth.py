@@ -3,9 +3,9 @@ from sqlalchemy import text
 from app.database import db
 from marshmallow import ValidationError
 
-from app.schemas.auth import RegisterSchema, RefreshSchema, LoginSchema
+from app.schemas.auth import RegisterSchema, LoginSchema, RefreshSchema
 from app.errors import error_response, first_martshmallow_message
-from app.services.auth import register_user, session_payload, login_user
+from app.services.auth import register_user, session_payload, login_user, rotate_refresh, logout_refresh
 
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -52,3 +52,27 @@ def login():
     except ValueError:
         return error_response("invalid_credentials", "Email or password is incorrect", 401)
     return jsonify(session_payload(user, refresh)), 200
+
+@auth.post("/refresh")
+def refresh():
+    try:
+        data = load_json(RefreshSchema())
+    except ValidationError as exc:
+        return error_response("invalid_body", first_martshmallow_message(exc), 400)
+    try:
+        user, new_refresh = rotate_refresh(data["refresh_token"])
+    except ValueError:
+        return error_response("invalid_refresh_token", "Refresh token is invalid, expired or revoked", 401)
+    return jsonify(session_payload(user, new_refresh)), 200
+
+@auth.post("/logout")
+def logout():
+    try:
+        data = load_json(RefreshSchema())
+    except ValidationError as exc:
+        return error_response("invalid_body", first_martshmallow_message(exc), 400)
+    try:
+        logout_refresh(data["refresh_token"])
+    except ValueError:
+        return error_response("invalid_refresh_token", "Refesh token is invalid, expired or revoked", 401)
+    return jsonify({"ok": True}, 200)

@@ -38,6 +38,16 @@ def create_refresh_token(user: User) -> str:
     db.session.commit()
     return raw
 
+def find_valid_refresh(raw: str) -> RefreshToken | None:
+    row = RefreshToken.query.filter_by(token_hash=hash_refresh_token(raw)).first()
+    if row is None:
+        return None
+    if row.revoked_at is not None:
+        return None
+    if as_utc(row.expires_at) <= utcnow():
+        return None
+    return row
+
 def dump_user(user: User)-> dict:
     return {
         "id": str(user.id),
@@ -61,7 +71,7 @@ def session_payload(user: User, refresh_raw: str) -> str:
     return {
         "user": dump_user(user),
         "access_token": issue_access_token(user),
-        "refresh_toke": refresh_raw,
+        "refresh_token": refresh_raw,
         "token_type": "Bearer",
         "expires_in": minutes * 60,
     }
@@ -90,3 +100,22 @@ def login_user(email:str, password: str) -> tuple[User, str]:
         raise ValueError("invalid_credentials")
     refresh = create_refresh_token(user)
     return user, refresh
+
+def rotate_refresh(raw: str) -> tuple[User, str]:
+    row = find_valid_refresh(raw)
+    if row is None:
+        raise ValueError("invalid_refresh")
+    user = db.session.get(User, row.user_id)
+    if user is None:
+        raise ValueError("invalid_refresh")
+    row.revoked_at = utcnow()
+    db.session.commit()
+    new_raw = create_refresh_token(user)
+    return user, new_raw
+
+def logout_refresh(raw: str) -> None:
+    row = find_valid_refresh(raw)
+    if row is None:
+        raise ValueError("invalid_refresh")
+    row.revoked_at = utcnow()
+    db.session.commit()
