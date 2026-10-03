@@ -26,7 +26,7 @@ class Profile(db.Model):
     goal: Mapped[str] = mapped_column(String(16), nullable=False)
     bmr: Mapped[int] = mapped_column(Integer, nullable=False)
     tdee: Mapped[int] = mapped_column(Integer, nullable=False)
-    target_calorie: Mapped[int] = mapped_column(Integer, nullable=False)
+    target_calories: Mapped[int] = mapped_column(Integer, nullable=False)
     target_protein_g: Mapped[int] = mapped_column(Integer, nullable=False)
     target_carbs_g: Mapped[int] = mapped_column(Integer, nullable=False)
     target_fat_g: Mapped[int] = mapped_column(Integer, nullable=False)

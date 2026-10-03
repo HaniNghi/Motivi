@@ -26,6 +26,21 @@ def hash_refresh_token(raw: str) -> str:
 def check_password(password: str, password_hash: str) -> bool:
     return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
 
+def decode_access_token(token: str) -> str | None:
+    try:
+        payload = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        return None, "expired"
+    except jwt.InvalidSignatureError:
+        return None, "invalid_signarture"
+    except jwt.PyJWTError:
+        return None, "invalid"
+    user_id = payload.get("sub")
+    if not user_id:
+        return None, "invalid"
+    return str(user_id), None
+        
+
 def create_refresh_token(user: User) -> str:
     raw = secrets.token_urlsafe(48)
     days = int(os.getenv("JWT_REFRESH_DAYS"))
