@@ -56,7 +56,8 @@ def create_app():
 
     from app import models
     from app.routes import register_blueprints
-    # from app.errors import register_error_handlers
+    from app.errors import register_error_handlers
 
     register_blueprints(app)
+    register_error_handlers(app)
     return app
