@@ -79,5 +79,9 @@ cd /Users/nghivo/Motivi/backend
 source .venv/bin/activate
 flask --app app:create_app run
 ```
+## openfoodfacts
 
+```
+curl -sS "https://world.openfoodfacts.org/cgi/search.pl?search_terms=apple&search_simple=1&action=process&json=1&page_size=9&lc=en&tagtype_0=languages&tag_contains_0=contains&tag_0=en" | head
+```
 > Make sure PostgreSQL is running before testing auth or me endpoints.

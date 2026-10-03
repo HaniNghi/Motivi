@@ -37,7 +37,7 @@ def post_me(user):
     except ValueError as exc:
         if str(exc) == "profile_exists":
             return error_response(
-                "profile_exists", "Profile already exists."
+                "profile_exists", "Profile already exists.", 400
             )
         raise
     return jsonify(me_payload(user)), 201
@@ -55,7 +55,7 @@ def put_me(user):
     except ValueError as exc:
         if str(exc) == "profile_not_found":
             return error_response(
-                "profile_not_found", "Profile does not exist."
+                "profile_not_found", "Profile does not exist.", 400
             )
         raise
     return jsonify(me_payload(user)), 200

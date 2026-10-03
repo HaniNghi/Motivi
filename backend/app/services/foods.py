@@ -14,6 +14,7 @@ def dump_food(food: Food) -> dict:
         "name": food.name,
         "brand": food.brand,
         "calories_per_100g": float(food.calories_per_100g),
+        "calories_per_100ml": (float(food.calories_per_100ml) if food.calories_per_100ml is not None else None),
         "protein_per_100g": float(food.protein_per_100g),
         "carbs_per_100g": float(food.carbs_per_100g),
         "fat_per_100g": float(food.fat_per_100g),
@@ -39,6 +40,7 @@ def upsert_off_product(product: dict) -> None:
         name=product["name"],
         brand=product.get("brand"), #optional#
         calories_per_100g=Decimal(str(product["calories_per_100g"])),
+        calories_per_100ml=(Decimal(str(product["calories_per_100ml"])) if product.get("calories_per_100ml") is not None else None),
         protein_per_100g=Decimal(str(product["protein_per_100g"])),
         carbs_per_100g=Decimal(str(product["carbs_per_100g"])),
         fat_per_100g=Decimal(str(product["fat_per_100g"])),
@@ -94,6 +96,7 @@ def create_custom_food(user: User, data: dict) -> Food:
     food = Food(
         name=data["name"].strip(),
         calories_per_100g=Decimal(str(data["calories_per_100g"])),
+        calories_per_100ml=(Decimal(str(data["calories_per_100ml"])) if data.get("calories_per_100ml") is not None else None),
         protein_per_100g=Decimal(str(data["protein_per_100g"])),
         carbs_per_100g=Decimal(str(data["carbs_per_100g"])),
         fat_per_100g=Decimal(str(data["fat_per_100g"])),

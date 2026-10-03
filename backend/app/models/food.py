@@ -22,6 +22,7 @@ class Food(db.Model):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     brand: Mapped[str | None] = mapped_column(String(255), nullable=True)
     calories_per_100g: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
+    calories_per_100ml: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
     protein_per_100g: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
     carbs_per_100g: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
     fat_per_100g: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)

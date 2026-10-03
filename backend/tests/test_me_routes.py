@@ -1,6 +1,8 @@
+import importlib
+
 from flask import Flask
 
-from app.routes import me as me_routes
+me_routes = importlib.import_module("app.routes.me")
 
 
 class FakeUser:
@@ -87,3 +89,30 @@ def test_put_me_updates_profile(monkeypatch):
     response, status_code = result
     assert status_code == 200
     assert response.get_json()["profile"]["goal"] == "lose"
+
+
+def test_put_me_returns_profile_not_found_when_profile_missing(monkeypatch):
+    app = Flask(__name__)
+    user = FakeUser()
+
+    payload = {
+        "age": 28,
+        "gender": "female",
+        "height_cm": 165,
+        "weight_kg": 60,
+        "activity_level": "light",
+        "goal": "lose",
+    }
+
+    def fake_update_profile(current_user, data):
+        raise ValueError("profile_not_found")
+
+    monkeypatch.setattr(me_routes, "update_profile", fake_update_profile)
+
+    with app.app_context():
+        with app.test_request_context("/api/me", method="PUT", json=payload):
+            result = me_routes.put_me.__wrapped__(user)
+
+    response, status_code = result
+    assert status_code == 400
+    assert response.get_json()["error"]["code"] == "profile_not_found"

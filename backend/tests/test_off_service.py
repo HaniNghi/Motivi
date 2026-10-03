@@ -12,7 +12,7 @@ class DummyResponse:
             "products": [
                 {
                     "code": "123",
-                    "product_name_en": "Rice",
+                    "product_name": "Rice",
                     "brands": "BrandX",
                     "nutriments": {
                         "energy_100g": 130,
@@ -40,6 +40,7 @@ def test_search_open_food_facts_returns_products(monkeypatch):
             "name": "Rice",
             "brand": "BrandX",
             "calories_per_100g": 130.0,
+            "calories_per_100ml": None,
             "protein_per_100g": 2.5,
             "carbs_per_100g": 28.0,
             "fat_per_100g": 0.5,

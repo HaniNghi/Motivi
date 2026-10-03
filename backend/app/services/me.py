@@ -59,7 +59,7 @@ def apply_profile_fields(profile: Profile, data: dict) -> None:
 
 def create_profile(user: User, data: dict) -> User:
     if user.profile is not None:
-        return ValueError("profile_exists")
+        raise ValueError("profile_exists")
     profile = Profile(user_id=user.id)
     apply_profile_fields(profile, data)
     db.session.add(profile)
@@ -69,7 +69,7 @@ def create_profile(user: User, data: dict) -> User:
 
 def update_profile(user: User, data: dict) -> User:
     if user.profile is None:
-        return ValueError("profile_not_found")
+        raise ValueError("profile_not_found")
     apply_profile_fields(user.profile, data)
     db.session.commit()
     db.session.refresh(user)
