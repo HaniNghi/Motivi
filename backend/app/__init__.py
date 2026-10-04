@@ -5,7 +5,6 @@ from flask import Flask
 from flask_cors import CORS
 
 from .database import db, migrate
-from .routes import register_blueprints
 
 
 def create_app():
@@ -55,9 +54,15 @@ def create_app():
     CORS(app)
 
     from app import models
+    from app.database.seed import seed_foods
     from app.routes import register_blueprints
     from app.errors import register_error_handlers
 
     register_blueprints(app)
     register_error_handlers(app)
+
+    with app.app_context():
+        count = seed_foods()
+        print(f"Seeded {count} foods.")
+
     return app
