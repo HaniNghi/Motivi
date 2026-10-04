@@ -125,8 +125,6 @@ SEED_FOODS = [
     ('Coconut Oil', 903, 0, 0, 100),
     ('Olive Oil', 0, 0, 0, 100, 903),
     ('Coconut Milk', 0, 0, 1.9, 2, 32),
-    ('Chicken Broth', 0, 2.4, 0, 1.7, 63),
-
 
 ]
 

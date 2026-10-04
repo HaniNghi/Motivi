@@ -3,6 +3,8 @@ from decimal import Decimal, ROUND_HALF_UP
 from app.database import db
 from app.models.profile import Profile
 from app.models.user import User
+from app.models.diary_entry import DiaryEntry
+from app.models.food import Food
 
 from app.services.calorie import compute_targets
 from app.services.auth import dump_user
@@ -74,3 +76,50 @@ def update_profile(user: User, data: dict) -> User:
     db.session.commit()
     db.session.refresh(user)
     return user
+
+def nutrion_totals(calories=0, protein=0, carbs=0, fat=0) -> dict:
+    return {
+        "calories":int(calories),
+        "protein_g": float(protein),
+        "carbs_g": float(carbs),
+        "fat_g": float(fat)
+    }
+
+def profile_targets(profile: Profile) -> dict:
+    return nutrion_totals(
+        profile.target_calories,
+        profile.target_protein_g,
+        profile.target_carbs_g,
+        profile.target_fat_g,
+    )
+
+def day_totals(user: User, day)-> dict:
+    entries = DiaryEntry.query.filter_by(user_id=user.id, entry_date=day).all()
+    calories = sum(item.calories for item in entries)
+    protein = sum(Decimal(str(item.protein_g)) for item in entries)
+    carbs = sum(Decimal(str(item.carbs_g)) for item in entries)
+    fat = sum(Decimal(str(item.fat_g)) for item in entries)
+    return nutrion_totals(calories, protein, carbs, fat), entries
+
+def remaining_from(target: dict, consumed: dict) -> dict:
+    return {
+        "calories": target["calories"] - consumed["calories"],
+        "protein_g": round(target["protein_g"] - consumed["protein_g"], 1),
+        "carbs_g": round(target["carbs_g"] - consumed["carbs_g"], 1),
+        "fat_g": round(target["fat_g"] - consumed["fat_g"], 1),
+    }
+
+def snapshot_from_food(food: Food, amount_g)-> dict:
+    amount = Decimal(str(amount_g))
+    factor = amount / Decimal("100")
+    calories = (Decimal(str(food.calories_per_100g)) * factor).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    protein = (Decimal(str(food.protein_per_100g)) * factor).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    carbs = (Decimal(str(food.carbs_per_100g)) * factor).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    fat = (Decimal(str(food.fat_per_100g)) * factor).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+
+    return {
+        "calories": int(calories),
+        "protein_g": protein,
+        "carbs_g": carbs,
+        "fat_g": fat,
+    }
