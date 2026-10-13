@@ -113,3 +113,21 @@ def test_post_custom_creates_food(monkeypatch):
     response, status_code = result
     assert status_code == 201
     assert response.get_json()["food"]["name"] == "My Pasta"
+
+
+def test_delete_custom_food_route_soft_deletes_owned_food(monkeypatch):
+    app = Flask(__name__)
+    user = FakeUser()
+
+    deleted_food = SimpleNamespace(id="custom-food-1", name="My Pasta", source="custom", created_by_user_id=user.id)
+
+    monkeypatch.setattr(foods_routes, "delete_custom_food", lambda current_user, food_id: deleted_food)
+
+    with app.app_context():
+        with app.test_request_context("/api/foods/custom-food-1", method="DELETE"):
+            result = foods_routes.delete_custom_food_route.__wrapped__(user, "custom-food-1")
+
+    response, status_code = result
+    assert status_code == 200
+    assert response.get_json()["deleted"] is True
+    assert response.get_json()["food"]["id"] == "custom-food-1"
