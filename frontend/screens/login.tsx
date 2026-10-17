@@ -70,7 +70,7 @@ export default function Login() {
                   <MaterialIcons
                     name={isPasswordSecure ? "visibility-off" : "visibility"}
                     size={24}
-                    color={colors.textMuted}
+                    color={colors.textSoft}
                   />
                 </TouchableOpacity>
               </View>
@@ -210,7 +210,6 @@ const styles = StyleSheet.create({
   passwordContainer:{
     width: '100%',
     height: 52,
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: "center",
