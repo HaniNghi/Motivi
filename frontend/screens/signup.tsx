@@ -19,8 +19,76 @@ import { MaterialIcons } from "@expo/vector-icons";
 const screenWidth = Dimensions.get("window").width;
 export default function Login() {
   const navigation = useNavigation<any>();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [isPasswordSecure, setIsPasswordSecure] = useState(true);
+  const [isConfirmPasswordSecure, setIsConfirmPasswordSecure] = useState(true);
+  
+  const [fullnameErrorMessage, setFullnameErrorMessage] = useState("");
+  const [emailErrorMessage, setEmailErrorMessge] = useState("");
+  const [pwErrorMessage, setPwErrorMessage] = useState("");
+  const [confirmPwErrorMessage, setConfirmPwErrorMessage] = useState("");
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const getPasswordError = () => {
+    setPwErrorMessage('');
+    setConfirmPwErrorMessage('');
+    if (password.trim() === '') {
+      setPwErrorMessage("Cannot leave empty field.");
+      return;
+    }
+    if (confirmPassword.trim() === '') {
+      setConfirmPwErrorMessage("Cannot leave empty field.");
+      return;
+    }
+    if (confirmPassword.trim() !== password.trim()) {
+      setConfirmPwErrorMessage("Password do not match.");
+      return;
+    }
+    if (confirmPassword.trim() === password.trim() && password.trim().length < 8 ) {
+      setPwErrorMessage("At least 8 characters.");
+      setConfirmPwErrorMessage("At least 8 characters.");
+      return;
+    }
+  }
+
+  const getEmailError = () => {
+    setEmailErrorMessge('');
+    if (email.trim() === '' || email.trim().length === 0) {
+      setEmailErrorMessge('Cannot leave empty email.');
+      return;
+    }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailErrorMessge('Invalid email.');
+      return;
+    }
+  }
+  const getFullnameError = () => {
+    setFullnameErrorMessage('');
+    if (fullName.trim() === '' || fullName.trim().length === 0) {
+      setFullnameErrorMessage('Cannot leave empty full name.');
+        return;
+      }    
+    }
+
+  const resetErrorMessage = () => {
+    setFullnameErrorMessage('');
+    setEmailErrorMessge('');
+    setPwErrorMessage('');
+    setConfirmPwErrorMessage('');
+  }
+
+  const handleCreateAccount = async () => {
+    getFullnameError();
+    getEmailError();
+    getPasswordError();
+  } 
+
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -39,7 +107,10 @@ export default function Login() {
                 style={styles.inputControl}
                 placeholder="Isabella Smith"
                 placeholderTextColor={colors.textSoft}
+                value={fullName}
+                onChangeText={(value) => setFullName(value)}
               />
+              {fullnameErrorMessage ? <Text style={styles.errorText}>{fullnameErrorMessage}</Text> : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Email</Text>
@@ -47,7 +118,10 @@ export default function Login() {
                 style={styles.inputControl}
                 placeholder="example@gmail.com"
                 placeholderTextColor={colors.textSoft}
+                value={email}
+                onChangeText={(value) => setEmail(value)}
               />
+              {emailErrorMessage ? <Text style={styles.errorText}>{emailErrorMessage}</Text> : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Password</Text>
@@ -57,6 +131,8 @@ export default function Login() {
                   style={styles.inputControl}
                   placeholder="••••••••"
                   placeholderTextColor={colors.textSoft}
+                  value={password}
+                  onChangeText={(value) => setPassword(value)}
                 />
                 <TouchableOpacity
                   style={styles.icon}
@@ -73,31 +149,35 @@ export default function Login() {
                   />
                 </TouchableOpacity>
               </View>
+              {pwErrorMessage ? <Text style={styles.errorText}>{pwErrorMessage}</Text> : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Confirm password</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
-                  secureTextEntry={isPasswordSecure}
+                  secureTextEntry={isConfirmPasswordSecure}
                   style={styles.inputControl}
                   placeholder="••••••••"
                   placeholderTextColor={colors.textSoft}
+                  value={confirmPassword}
+                  onChangeText={(value) => setConfirmPassword(value)}
                 />
                 <TouchableOpacity
                   style={styles.icon}
                   onPress={() => {
-                    isPasswordSecure
-                      ? setIsPasswordSecure(false)
-                      : setIsPasswordSecure(true);
+                    isConfirmPasswordSecure
+                      ? setIsConfirmPasswordSecure(false)
+                      : setIsConfirmPasswordSecure(true);
                   }}
                 >
                   <MaterialIcons
-                    name={isPasswordSecure ? "visibility-off" : "visibility"}
+                    name={isConfirmPasswordSecure ? "visibility-off" : "visibility"}
                     size={24}
                     color={colors.textSoft}
                   />
                 </TouchableOpacity>
               </View>
+              {confirmPwErrorMessage ? <Text style={styles.errorText}>{confirmPwErrorMessage}</Text> : null}
             </View>
             <View style={styles.btnContainer}>
               <TouchableOpacity
@@ -106,6 +186,7 @@ export default function Login() {
                   { alignSelf: "center", width: "95%" },
                 ]}
                 activeOpacity={0.8}
+                onPress={handleCreateAccount}
               >
                 <LinearGradient
                   colors={colors.primaryGradient}
@@ -235,5 +316,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: "center",
     position: 'relative',
+  },
+  errorText: {
+    color: colors.danger,
+    alignSelf: 'flex-start',
+    marginLeft: 10
   }
 });
