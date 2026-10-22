@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import {
+  Alert,
   Button,
   Dimensions,
   Image,
@@ -15,6 +16,8 @@ import keys from "../styles/keys";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import { createUser } from "../services/auth";
+import { CreateUser } from "../types";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Login() {
@@ -26,7 +29,7 @@ export default function Login() {
 
   const [isPasswordSecure, setIsPasswordSecure] = useState(true);
   const [isConfirmPasswordSecure, setIsConfirmPasswordSecure] = useState(true);
-  
+
   const [fullnameErrorMessage, setFullnameErrorMessage] = useState("");
   const [emailErrorMessage, setEmailErrorMessge] = useState("");
   const [pwErrorMessage, setPwErrorMessage] = useState("");
@@ -49,7 +52,7 @@ export default function Login() {
       setConfirmPwErrorMessage("Password do not match.");
       return;
     }
-    if (confirmPassword.trim() === password.trim() && password.trim().length < 8 ) {
+    if (confirmPassword.trim() === password.trim() && password.trim().length < 8) {
       setPwErrorMessage("At least 8 characters.");
       setConfirmPwErrorMessage("At least 8 characters.");
       return;
@@ -71,9 +74,9 @@ export default function Login() {
     setFullnameErrorMessage('');
     if (fullName.trim() === '' || fullName.trim().length === 0) {
       setFullnameErrorMessage('Cannot leave empty full name.');
-        return;
-      }    
+      return;
     }
+  }
 
   const resetErrorMessage = () => {
     setFullnameErrorMessage('');
@@ -83,10 +86,29 @@ export default function Login() {
   }
 
   const handleCreateAccount = async () => {
+    resetErrorMessage();
     getFullnameError();
     getEmailError();
     getPasswordError();
-  } 
+
+    const createUserPayload: CreateUser = {
+      email: email,
+      password: password,
+      display_name: fullName,
+    }
+
+    const result = await createUser(createUserPayload);
+
+    console.log("result", result)
+    if (!result.ok) {
+      Alert.alert("Fail to sign up", result.error.message);
+      return;
+    }
+
+    // success flow
+    Alert.alert("Success", "Account created");
+
+  }
 
 
   return (
@@ -309,7 +331,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
   },
-  passwordContainer:{
+  passwordContainer: {
     width: '100%',
     height: 52,
     flexDirection: 'row',

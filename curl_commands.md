@@ -6,8 +6,8 @@
 curl -i -X POST http://127.0.0.1:5000/api/auth/register \
   -H "Content-Type: application/json" \
   --data '{
-    "email": "test@example.com",
-    "password": "123456789",
+    "email": "Idamoon@gmail.com",
+    "password": "12345678",
     "display_name": "Tester"
   }'
 ```

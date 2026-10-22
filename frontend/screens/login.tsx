@@ -19,8 +19,52 @@ import { MaterialIcons } from "@expo/vector-icons";
 const screenWidth = Dimensions.get("window").width;
 export default function Login() {
   const navigation = useNavigation<any>();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordSecure, setIsPasswordSecure] = useState(true);
+
+  const [emailErrorMessage, setEmailErrorMessge] = useState("");
+  const [pwErrorMessage, setPwErrorMessage] = useState("");
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const getPasswordError = () => {
+    if (password.trim() === '' || password.trim().length === 0 ) {
+      setPwErrorMessage('Cannot leave empty password.');
+      return;
+    }
+
+    if (password.trim().length < 8) {
+      setPwErrorMessage('At least 8 characters.');
+      return;
+    }
+  }
+
+  const getEmailError = () => {
+    if (email.trim() || email.trim().length === 0) {
+      setEmailErrorMessge('Cannot leave empty email.');
+      return;
+    }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailErrorMessge('Invalid email.');
+      return;
+    }
+  }
+
+  const resetErrorMessage = () => {
+    setEmailErrorMessge('');
+    setPwErrorMessage('');
+  }
+
+  const handleLogin = async () => {
+    resetErrorMessage();
+    getEmailError();
+    getPasswordError();
+
+
+  } 
+
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -48,7 +92,10 @@ export default function Login() {
                 style={styles.inputControl}
                 placeholder="example@gmail.com"
                 placeholderTextColor={colors.textSoft}
+                value={email}
+                onChangeText={(value) => setEmail(value)}
               />
+              { emailErrorMessage ? <Text>{emailErrorMessage}</Text> : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Password</Text>
@@ -58,6 +105,8 @@ export default function Login() {
                   style={styles.inputControl}
                   placeholder="••••••••"
                   placeholderTextColor={colors.textSoft}
+                  value={password}
+                  onChangeText={(value) => setPassword(value)}
                 />
                 <TouchableOpacity
                   style={styles.icon}
@@ -74,6 +123,7 @@ export default function Login() {
                   />
                 </TouchableOpacity>
               </View>
+              { pwErrorMessage ? <Text>{pwErrorMessage}</Text> : null}
             </View>
             <View style={styles.btnContainer}>
               <TouchableOpacity
