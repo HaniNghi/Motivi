@@ -38,13 +38,13 @@ export default function Login() {
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const getPasswordError = () => {
-    setPwErrorMessage('');
-    setConfirmPwErrorMessage('');
-    if (password.trim() === '') {
+    setPwErrorMessage("");
+    setConfirmPwErrorMessage("");
+    if (password.trim() === "") {
       setPwErrorMessage("Cannot leave empty field.");
       return;
     }
-    if (confirmPassword.trim() === '') {
+    if (confirmPassword.trim() === "") {
       setConfirmPwErrorMessage("Cannot leave empty field.");
       return;
     }
@@ -52,38 +52,41 @@ export default function Login() {
       setConfirmPwErrorMessage("Password do not match.");
       return;
     }
-    if (confirmPassword.trim() === password.trim() && password.trim().length < 8) {
+    if (
+      confirmPassword.trim() === password.trim() &&
+      password.trim().length < 8
+    ) {
       setPwErrorMessage("At least 8 characters.");
       setConfirmPwErrorMessage("At least 8 characters.");
       return;
     }
-  }
+  };
 
   const getEmailError = () => {
-    setEmailErrorMessge('');
-    if (email.trim() === '' || email.trim().length === 0) {
-      setEmailErrorMessge('Cannot leave empty email.');
+    setEmailErrorMessge("");
+    if (email.trim() === "" || email.trim().length === 0) {
+      setEmailErrorMessge("Cannot leave empty email.");
       return;
     }
     if (!EMAIL_REGEX.test(email.trim())) {
-      setEmailErrorMessge('Invalid email.');
+      setEmailErrorMessge("Invalid email.");
       return;
     }
-  }
+  };
   const getFullnameError = () => {
-    setFullnameErrorMessage('');
-    if (fullName.trim() === '' || fullName.trim().length === 0) {
-      setFullnameErrorMessage('Cannot leave empty full name.');
+    setFullnameErrorMessage("");
+    if (fullName.trim() === "" || fullName.trim().length === 0) {
+      setFullnameErrorMessage("Cannot leave empty full name.");
       return;
     }
-  }
+  };
 
   const resetErrorMessage = () => {
-    setFullnameErrorMessage('');
-    setEmailErrorMessge('');
-    setPwErrorMessage('');
-    setConfirmPwErrorMessage('');
-  }
+    setFullnameErrorMessage("");
+    setEmailErrorMessge("");
+    setPwErrorMessage("");
+    setConfirmPwErrorMessage("");
+  };
 
   const handleCreateAccount = async () => {
     resetErrorMessage();
@@ -91,25 +94,33 @@ export default function Login() {
     getEmailError();
     getPasswordError();
 
-    const createUserPayload: CreateUser = {
-      email: email,
-      password: password,
-      display_name: fullName,
-    }
-
-    const result = await createUser(createUserPayload);
-
-    console.log("result", result)
-    if (!result.ok) {
-      Alert.alert("Fail to sign up", result.error.message);
+    if (
+      fullnameErrorMessage ||
+      emailErrorMessage ||
+      pwErrorMessage ||
+      confirmPwErrorMessage
+    ) {
       return;
+    } else {
+      const createUserPayload: CreateUser = {
+        email: email,
+        password: password,
+        display_name: fullName,
+      };
+
+      const result = await createUser(createUserPayload);
+
+      console.log("result", result);
+      if (!result.ok) {
+        Alert.alert("Fail to sign up", result.error.message);
+        return;
+      }
+
+      // success flow
+      Alert.alert("Success", "Account created");
+      navigation.navigate("Login")
     }
-
-    // success flow
-    Alert.alert("Success", "Account created");
-
-  }
-
+  };
 
   return (
     <SafeAreaProvider>
@@ -132,7 +143,9 @@ export default function Login() {
                 value={fullName}
                 onChangeText={(value) => setFullName(value)}
               />
-              {fullnameErrorMessage ? <Text style={styles.errorText}>{fullnameErrorMessage}</Text> : null}
+              {fullnameErrorMessage ? (
+                <Text style={styles.errorText}>{fullnameErrorMessage}</Text>
+              ) : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Email</Text>
@@ -143,7 +156,9 @@ export default function Login() {
                 value={email}
                 onChangeText={(value) => setEmail(value)}
               />
-              {emailErrorMessage ? <Text style={styles.errorText}>{emailErrorMessage}</Text> : null}
+              {emailErrorMessage ? (
+                <Text style={styles.errorText}>{emailErrorMessage}</Text>
+              ) : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Password</Text>
@@ -171,7 +186,9 @@ export default function Login() {
                   />
                 </TouchableOpacity>
               </View>
-              {pwErrorMessage ? <Text style={styles.errorText}>{pwErrorMessage}</Text> : null}
+              {pwErrorMessage ? (
+                <Text style={styles.errorText}>{pwErrorMessage}</Text>
+              ) : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Confirm password</Text>
@@ -193,13 +210,17 @@ export default function Login() {
                   }}
                 >
                   <MaterialIcons
-                    name={isConfirmPasswordSecure ? "visibility-off" : "visibility"}
+                    name={
+                      isConfirmPasswordSecure ? "visibility-off" : "visibility"
+                    }
                     size={24}
                     color={colors.textSoft}
                   />
                 </TouchableOpacity>
               </View>
-              {confirmPwErrorMessage ? <Text style={styles.errorText}>{confirmPwErrorMessage}</Text> : null}
+              {confirmPwErrorMessage ? (
+                <Text style={styles.errorText}>{confirmPwErrorMessage}</Text>
+              ) : null}
             </View>
             <View style={styles.btnContainer}>
               <TouchableOpacity
@@ -328,20 +349,20 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   icon: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
   },
   passwordContainer: {
-    width: '100%',
+    width: "100%",
     height: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "center",
-    position: 'relative',
+    position: "relative",
   },
   errorText: {
     color: colors.danger,
-    alignSelf: 'flex-start',
-    marginLeft: 10
-  }
+    alignSelf: "flex-start",
+    marginLeft: 10,
+  },
 });

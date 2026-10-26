@@ -13,8 +13,6 @@ export type Error = {
         message: string,
     }
 }
-
-
 export interface CreateUser {
     email: string,
     password: string,
@@ -25,6 +23,11 @@ export interface User {
     id: string,
     email: string,
     display_name: string,
+}
+
+export interface LoginUser {
+    email: string,
+    password: string,
 }
 
 export interface UserSession {

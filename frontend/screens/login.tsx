@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import {
+  Alert,
   Button,
   Dimensions,
   Image,
@@ -15,6 +16,8 @@ import keys from "../styles/keys";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import { login } from "../services/auth";
+import { LoginUser } from "../types";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Login() {
@@ -29,7 +32,9 @@ export default function Login() {
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const getPasswordError = () => {
-    if (password.trim() === '' || password.trim().length === 0 ) {
+    setPwErrorMessage('');
+
+    if (password.trim() === '' || password.trim().length === 0) {
       setPwErrorMessage('Cannot leave empty password.');
       return;
     }
@@ -41,7 +46,9 @@ export default function Login() {
   }
 
   const getEmailError = () => {
-    if (email.trim() || email.trim().length === 0) {
+    setEmailErrorMessge('');
+
+    if (email.trim() === '' || email.trim().length === 0) {
       setEmailErrorMessge('Cannot leave empty email.');
       return;
     }
@@ -61,9 +68,25 @@ export default function Login() {
     getEmailError();
     getPasswordError();
 
+    if (emailErrorMessage || pwErrorMessage) {
+      return;
+    } else {
+      const payload: LoginUser = {
+        email: email,
+        password: password
+      }
 
-  } 
+      const result = await login(payload)
 
+      if (!result.ok) {
+        Alert.alert("Fail to login", result.error.message)
+      }
+
+      if (result.ok) {
+        Alert.alert("Success", "Login successfully");
+      }
+    }
+  }
 
   return (
     <SafeAreaProvider>
@@ -95,7 +118,7 @@ export default function Login() {
                 value={email}
                 onChangeText={(value) => setEmail(value)}
               />
-              { emailErrorMessage ? <Text>{emailErrorMessage}</Text> : null}
+              {emailErrorMessage ? <Text style={styles.errorText}>{emailErrorMessage}</Text> : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Password</Text>
@@ -123,7 +146,7 @@ export default function Login() {
                   />
                 </TouchableOpacity>
               </View>
-              { pwErrorMessage ? <Text>{pwErrorMessage}</Text> : null}
+              {pwErrorMessage ? <Text style={styles.errorText}>{pwErrorMessage}</Text> : null}
             </View>
             <View style={styles.btnContainer}>
               <TouchableOpacity
@@ -132,6 +155,7 @@ export default function Login() {
                   { alignSelf: "center", width: "95%" },
                 ]}
                 activeOpacity={0.8}
+                onPress={handleLogin}
               >
                 <LinearGradient
                   colors={colors.primaryGradient}
@@ -257,12 +281,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
   },
-  passwordContainer:{
+  passwordContainer: {
     width: '100%',
     height: 52,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: "center",
     position: 'relative',
+  },
+  errorText: {
+    color: colors.danger,
+    alignSelf: 'flex-start',
+    marginLeft: 10
   }
 });

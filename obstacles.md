@@ -196,3 +196,59 @@ That comparison makes debugging much faster because it answers one question clea
 - Or is the request wrong?
 
 Once I confirmed that curl worked and Postman did not, I could focus on the actual client issue rather than breaking working backend logic.
+
+---
+
+## 11) Expo / Node startup failure: `EPERM: process.cwd failed with error operation not permitted, uv_cwd`
+
+I encountered a frontend startup issue where running:
+
+```bash
+cd ~/Motivi/frontend
+npx expo start
+```
+
+or even:
+
+```bash
+npm i
+```
+
+failed before the project booted.
+
+### Error seen
+
+```bash
+Error: EPERM: process.cwd failed with error operation not permitted, uv_cwd
+```
+
+### What I verified
+
+- the folder existed and was readable
+- the shell could run `pwd` and list the directory
+- but Node itself crashed when calling `process.cwd()`
+
+### Root cause
+
+This was not an Expo or app-level code issue. The error happened in the Node runtime before npm/expo could initialize.
+
+The strongest clue was the runtime version:
+
+```bash
+Node.js v26.0.0
+```
+
+This version appears to trigger a runtime environment problem on this machine, causing `uv_cwd` to fail even though the folder itself is valid.
+
+### Fix attempted
+
+- checked directory permissions
+- verified the project directory exists
+- moved to a cleaner shell location
+- tried a different Node version path
+
+### Working direction
+
+The likely fix is to switch to a stable LTS Node version such as 22 or 20 and reinstall npm tools in a clean environment.
+
+This is a toolchain issue rather than a frontend code issue, so it must be resolved before `npx expo start` can work.
