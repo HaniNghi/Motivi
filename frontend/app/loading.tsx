@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import {
   Dimensions,
   Image,
@@ -12,12 +11,13 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import keys from "../styles/keys";
 import colors from "../styles/colors";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 export default function Loading() {
-  const navigation = useNavigation<any>();
+  const router = useRouter();
   const logoSize = screenWidth*0.4;
 
   return (
@@ -33,14 +33,14 @@ export default function Loading() {
             <View style={{ width: logoSize }}>
               <Image
                 style={styles.logo}
-                source={require("../assets/logo.png")}
+                source={require("./../assets/logo.png")}
               />
             </View>
             <Text style={styles.splashTitle}>Motivi</Text>
             <Text style={styles.splashSubTitle}>Eat with intention</Text>
             <TouchableOpacity
               style={{ marginTop: 40 }}
-              onPress={() => navigation.navigate("Login")}
+              onPress={() => router.push("/login")}
             >
               <Text style={styles.link}>Go to log in</Text>
             </TouchableOpacity>

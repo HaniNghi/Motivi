@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import {
   Alert,
   Button,
@@ -11,104 +10,143 @@ import {
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import colors from "../styles/colors";
-import keys from "../styles/keys";
+import colors from "../../styles/colors";
+import keys from "../../styles/keys";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { login } from "../services/auth";
-import { LoginUser } from "../types";
+import { createUser } from "../../services/auth";
+import { CreateUser } from "../../types";
+import { useRouter } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
-export default function Login() {
-  const navigation = useNavigation<any>();
+export default function Signup() {
+  const router = useRouter();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswordSecure, setIsPasswordSecure] = useState(true);
+  const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [isPasswordSecure, setIsPasswordSecure] = useState(true);
+  const [isConfirmPasswordSecure, setIsConfirmPasswordSecure] = useState(true);
+
+  const [fullnameErrorMessage, setFullnameErrorMessage] = useState("");
   const [emailErrorMessage, setEmailErrorMessge] = useState("");
   const [pwErrorMessage, setPwErrorMessage] = useState("");
+  const [confirmPwErrorMessage, setConfirmPwErrorMessage] = useState("");
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const getPasswordError = () => {
-    setPwErrorMessage('');
-
-    if (password.trim() === '' || password.trim().length === 0) {
-      setPwErrorMessage('Cannot leave empty password.');
+    setPwErrorMessage("");
+    setConfirmPwErrorMessage("");
+    if (password.trim() === "") {
+      setPwErrorMessage("Cannot leave empty field.");
       return;
     }
-
-    if (password.trim().length < 8) {
-      setPwErrorMessage('At least 8 characters.');
+    if (confirmPassword.trim() === "") {
+      setConfirmPwErrorMessage("Cannot leave empty field.");
       return;
     }
-  }
+    if (confirmPassword.trim() !== password.trim()) {
+      setConfirmPwErrorMessage("Password do not match.");
+      return;
+    }
+    if (
+      confirmPassword.trim() === password.trim() &&
+      password.trim().length < 8
+    ) {
+      setPwErrorMessage("At least 8 characters.");
+      setConfirmPwErrorMessage("At least 8 characters.");
+      return;
+    }
+  };
 
   const getEmailError = () => {
-    setEmailErrorMessge('');
-
-    if (email.trim() === '' || email.trim().length === 0) {
-      setEmailErrorMessge('Cannot leave empty email.');
+    setEmailErrorMessge("");
+    if (email.trim() === "" || email.trim().length === 0) {
+      setEmailErrorMessge("Cannot leave empty email.");
       return;
     }
     if (!EMAIL_REGEX.test(email.trim())) {
-      setEmailErrorMessge('Invalid email.');
+      setEmailErrorMessge("Invalid email.");
       return;
     }
-  }
+  };
+  const getFullnameError = () => {
+    setFullnameErrorMessage("");
+    if (fullName.trim() === "" || fullName.trim().length === 0) {
+      setFullnameErrorMessage("Cannot leave empty full name.");
+      return;
+    }
+  };
 
   const resetErrorMessage = () => {
-    setEmailErrorMessge('');
-    setPwErrorMessage('');
-  }
+    setFullnameErrorMessage("");
+    setEmailErrorMessge("");
+    setPwErrorMessage("");
+    setConfirmPwErrorMessage("");
+  };
 
-  const handleLogin = async () => {
+  const handleCreateAccount = async () => {
     resetErrorMessage();
+    getFullnameError();
     getEmailError();
     getPasswordError();
 
-    if (emailErrorMessage || pwErrorMessage) {
+    if (
+      fullnameErrorMessage ||
+      emailErrorMessage ||
+      pwErrorMessage ||
+      confirmPwErrorMessage
+    ) {
       return;
     } else {
-      const payload: LoginUser = {
+      const createUserPayload: CreateUser = {
         email: email,
-        password: password
-      }
+        password: password,
+        display_name: fullName,
+      };
 
-      const result = await login(payload)
+      const result = await createUser(createUserPayload);
 
+      console.log("result", result);
       if (!result.ok) {
-        Alert.alert("Fail to login", result.error.message)
+        Alert.alert("Fail to sign up", result.error.message);
+        return;
       }
 
-      if (result.ok) {
-        Alert.alert("Success", "Login successfully");
-      }
+      // success flow
+      Alert.alert("Success", "Account created");
+      router.dismissTo("/signup")
     }
-  }
+  };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.imageContainer}>
-          <Image
-            style={styles.image}
-            source={require("../assets/login-banner.png")}
-          />
-          <LinearGradient
-            colors={[colors.heroOverlay, colors.page]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
           <View style={styles.welcomeContainer}>
-            <Text style={styles.welcomeText}>Welcome back</Text>
-            <Text style={styles.subText}>Continue your calorie diary.</Text>
+            <Text style={styles.welcomeText}>Create your</Text>
+            <Text style={styles.welcomeText}>Motivi</Text>
+            <Text style={styles.subText}>Start eating with intention.</Text>
           </View>
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.form}>
+            <View style={styles.input}>
+              <Text style={styles.inputLabel}>Full name</Text>
+              <TextInput
+                style={styles.inputControl}
+                placeholder="Isabella Smith"
+                placeholderTextColor={colors.textSoft}
+                value={fullName}
+                onChangeText={(value) => setFullName(value)}
+              />
+              {fullnameErrorMessage ? (
+                <Text style={styles.errorText}>{fullnameErrorMessage}</Text>
+              ) : null}
+            </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
@@ -118,7 +156,9 @@ export default function Login() {
                 value={email}
                 onChangeText={(value) => setEmail(value)}
               />
-              {emailErrorMessage ? <Text style={styles.errorText}>{emailErrorMessage}</Text> : null}
+              {emailErrorMessage ? (
+                <Text style={styles.errorText}>{emailErrorMessage}</Text>
+              ) : null}
             </View>
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Password</Text>
@@ -146,7 +186,41 @@ export default function Login() {
                   />
                 </TouchableOpacity>
               </View>
-              {pwErrorMessage ? <Text style={styles.errorText}>{pwErrorMessage}</Text> : null}
+              {pwErrorMessage ? (
+                <Text style={styles.errorText}>{pwErrorMessage}</Text>
+              ) : null}
+            </View>
+            <View style={styles.input}>
+              <Text style={styles.inputLabel}>Confirm password</Text>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  secureTextEntry={isConfirmPasswordSecure}
+                  style={styles.inputControl}
+                  placeholder="••••••••"
+                  placeholderTextColor={colors.textSoft}
+                  value={confirmPassword}
+                  onChangeText={(value) => setConfirmPassword(value)}
+                />
+                <TouchableOpacity
+                  style={styles.icon}
+                  onPress={() => {
+                    isConfirmPasswordSecure
+                      ? setIsConfirmPasswordSecure(false)
+                      : setIsConfirmPasswordSecure(true);
+                  }}
+                >
+                  <MaterialIcons
+                    name={
+                      isConfirmPasswordSecure ? "visibility-off" : "visibility"
+                    }
+                    size={24}
+                    color={colors.textSoft}
+                  />
+                </TouchableOpacity>
+              </View>
+              {confirmPwErrorMessage ? (
+                <Text style={styles.errorText}>{confirmPwErrorMessage}</Text>
+              ) : null}
             </View>
             <View style={styles.btnContainer}>
               <TouchableOpacity
@@ -155,7 +229,7 @@ export default function Login() {
                   { alignSelf: "center", width: "95%" },
                 ]}
                 activeOpacity={0.8}
-                onPress={handleLogin}
+                onPress={handleCreateAccount}
               >
                 <LinearGradient
                   colors={colors.primaryGradient}
@@ -163,18 +237,18 @@ export default function Login() {
                   end={{ x: 1, y: 0 }}
                   style={StyleSheet.absoluteFill}
                 />
-                <Text style={keys.primaryButtonText}>Log in</Text>
+                <Text style={keys.primaryButtonText}>Create account</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           <TouchableOpacity
             style={styles.signupText}
-            onPress={() => navigation.navigate("Signup")}
+            onPress={() => router.push("/login")}
           >
             <Text style={styles.signupLinkText}>
-              Don't have an account?
-              <Text style={styles.signupBoldText}>Sign up</Text>
+              Already have an account?
+              <Text style={styles.signupBoldText}>Log in</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -227,11 +301,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: screenWidth,
-    height: 200,
-    position: "relative",
-    overflow: "hidden",
+    height: 160,
     backgroundColor: colors.page,
-    marginBottom: 0,
   },
   image: {
     width: "100%",
@@ -278,20 +349,20 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   icon: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
   },
   passwordContainer: {
-    width: '100%',
+    width: "100%",
     height: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "center",
-    position: 'relative',
+    position: "relative",
   },
   errorText: {
     color: colors.danger,
-    alignSelf: 'flex-start',
-    marginLeft: 10
-  }
+    alignSelf: "flex-start",
+    marginLeft: 10,
+  },
 });
