@@ -1,49 +1,38 @@
-import { CreateUser, User, UserSession, ApiError, ApiResult, LoginUser } from "../types";
-import { callNonAuthApi, handleError } from "./helper";
+import {
+    CreateUser,
+    User,
+    UserSession,
+    ApiError,
+    ApiResult,
+    LoginUser,
+} from "../lib/types";
+import { callApi, handleError } from "./helper";
 
-export const createUser = async (payload: CreateUser): Promise<ApiResult<UserSession | ApiError>> => {
+export const createUser = async (payload: CreateUser): Promise<UserSession> => {
     try {
-        const response = await callNonAuthApi("POST", "/auth/register", payload);
-
+        const response = await callApi("POST", "/auth/register", payload);
         if (!response.ok) {
-            return {
-                ok: false,
-                error: await handleError(response)
-            }
+            const err = await handleError(response);
+            throw new Error(err.message);
         }
-
         const newUser: UserSession = await response.json();
-        return {
-            ok: true,
-            data: newUser
-        };
-    } catch (error) {
-        return {
-            ok: false,
-            error: await handleError(error)
-        }
+        return newUser;
+    } catch (error: any) {
+        throw error;
     }
 };
 
-export const login = async (payload: LoginUser): Promise<ApiResult<UserSession | ApiError>> => {
+export const loginUser = async (payload: LoginUser): Promise<UserSession> => {
     try {
-        const response = await callNonAuthApi("POST", "/auth/login", payload);
+        const response = await callApi("POST", "/auth/login", payload);
         if (!response.ok) {
-            return {
-                ok: false,
-                error: await handleError(response)
-            }
+            const err = await handleError(response);
+            throw new Error(err.message);
         }
 
         const loggedUser: UserSession = await response.json();
-        return {
-            ok: true,
-            data: loggedUser
-        }
-    } catch (error) {
-        return {
-            ok:false,
-            error: await handleError(error)
-        }
+        return loggedUser
+    } catch (error: any) {
+        throw error;
     }
-}
+};

@@ -14,12 +14,14 @@ import keys from "../../styles/keys";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { login } from "../../services/auth";
-import { LoginUser } from "../../types";
+import { loginUser } from "../../services/auth";
+import { LoginUser } from "../../lib/types";
 import { useRouter } from "expo-router";
+import { useAuth } from "../../context/AuthContext";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Login() {
+  const { login } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -74,16 +76,14 @@ export default function Login() {
         email: email,
         password: password
       }
-
-      const result = await login(payload)
-
-      if (!result.ok) {
-        Alert.alert("Fail to login", result.error.message)
-      }
-
-      if (result.ok) {
+      try {
+        const result = await loginUser(payload)
         Alert.alert("Success", "Login successfully");
+        await login(result);
+      } catch (error: any) {
+        Alert.alert("Fail to login", error.message)
       }
+
     }
   }
 

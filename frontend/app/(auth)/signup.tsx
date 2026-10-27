@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { createUser } from "../../services/auth";
-import { CreateUser } from "../../types";
+import { ApiError, CreateUser } from "../../lib/types";
 import { useRouter } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
@@ -40,11 +40,11 @@ export default function Signup() {
   const getPasswordError = () => {
     setPwErrorMessage("");
     setConfirmPwErrorMessage("");
-    if (password.trim() === "") {
+    if (!password.trim()) {
       setPwErrorMessage("Cannot leave empty field.");
       return;
     }
-    if (confirmPassword.trim() === "") {
+    if (!confirmPassword.trim()) {
       setConfirmPwErrorMessage("Cannot leave empty field.");
       return;
     }
@@ -64,7 +64,7 @@ export default function Signup() {
 
   const getEmailError = () => {
     setEmailErrorMessge("");
-    if (email.trim() === "" || email.trim().length === 0) {
+    if (!email.trim() || email.trim().length === 0) {
       setEmailErrorMessge("Cannot leave empty email.");
       return;
     }
@@ -88,17 +88,20 @@ export default function Signup() {
     setConfirmPwErrorMessage("");
   };
 
-  const handleCreateAccount = async () => {
-    resetErrorMessage();
+  const isValid = () :boolean => {
     getFullnameError();
     getEmailError();
     getPasswordError();
+    if (fullnameErrorMessage || emailErrorMessage || pwErrorMessage || confirmPwErrorMessage) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-    if (
-      fullnameErrorMessage ||
-      emailErrorMessage ||
-      pwErrorMessage ||
-      confirmPwErrorMessage
+  const handleCreateAccount = async () => {
+    resetErrorMessage();
+    if (!isValid()
     ) {
       return;
     } else {
@@ -108,16 +111,16 @@ export default function Signup() {
         display_name: fullName,
       };
 
-      const result = await createUser(createUserPayload);
-
-      if (!result.ok) {
-        Alert.alert("Fail to sign up", result.error.message);
-        return;
+      try {
+        const result = await createUser(createUserPayload);
+        if (result) {
+          Alert.alert("Success", "Account created");
+          router.dismissTo("/login")
+        }
+      } catch (error: any) {
+        Alert.alert("Fail to sign up", error.message);
       }
 
-      // success flow
-      Alert.alert("Success", "Account created");
-      router.dismissTo("/signup")
     }
   };
 

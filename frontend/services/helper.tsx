@@ -1,12 +1,51 @@
-import { ApiError, Error } from "../types";
+import {
+    clearSession,
+    getAccessToken,
+    getRefreshToken,
+    saveSession,
+} from "../lib/storage";
+import { ApiError, Error, UserSession } from "../lib/types";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_API_URL;
 
+let isRefreshingPromise: Promise<string | null> | null = null;
 
+export const refreshAccessToken = async (): Promise<string | null> => {
+    if (isRefreshingPromise) {
+        return isRefreshingPromise;
+    }
 
-export const handleError = async (errorResponse: any): Promise<ApiError> => {
+    isRefreshingPromise = (async () => {
+        try {
+            const refreshToken = await getRefreshToken();
+            if (!refreshToken) {
+                return null;
+            }
+            const response = await fetch(`${API_URL}/refresh`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            });
+            if (!response.ok) {
+                await clearSession();
+                return null;
+            }
+            const data = (await response.json()) as UserSession;
+            await saveSession(data.access_token, data.refresh_token, data.user);
+            return data.access_token;
+        } catch (error) {
+            return null;
+        } finally {
+            isRefreshingPromise = null;
+        }
+    })();
+
+    return isRefreshingPromise;
+};
+
+export const handleError = async (errorResponse: any): Promise<any> => {
     try {
-        const error = await errorResponse.json()
+        const error = await errorResponse.json();
         return {
             code: error?.error?.code,
             message: error?.error?.message,
@@ -23,40 +62,44 @@ export const callApi = async (
     method: string,
     endpoint: string,
     payload?: any,
-    token?: string,
+    auth?: boolean,
 ) => {
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
     };
 
-    if (token) {
+    if (auth) {
+        const token = await getAccessToken();
         headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    let response = await fetch(`${API_URL}${endpoint}`, {
         method,
         headers,
-        body: payload !== undefined && payload !== null && method !== "GET" && method !== "DELETE"
-            ? JSON.stringify(payload)
-            : undefined,
+        body:
+            payload !== undefined &&
+                payload !== null &&
+                method !== "GET" &&
+                method !== "DELETE"
+                ? JSON.stringify(payload)
+                : undefined,
     });
 
+    if (auth && response.status === 401) {
+        const newToken = await refreshAccessToken();
+        headers.Authorization = `Bearer ${newToken}`;
+
+        response = await fetch(`${API_URL}${endpoint}`, {
+            method,
+            headers,
+            body:
+                payload !== undefined &&
+                    payload !== null &&
+                    method !== "GET" &&
+                    method !== "DELETE"
+                    ? JSON.stringify(payload)
+                    : undefined,
+        });
+    }
     return response;
-};
-
-export const callNonAuthApi = async (
-    method: string,
-    endpoint: string,
-    payload?: any,
-) => {
-    return callApi(method, endpoint, payload);
-};
-
-export const callAuthApi = async (
-    method: string,
-    endpoint: string,
-    token: string,
-    payload?: any,
-) => {
-    return callApi(method, endpoint, payload, token);
 };
