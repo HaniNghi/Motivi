@@ -110,7 +110,6 @@ export default function Signup() {
 
       const result = await createUser(createUserPayload);
 
-      console.log("result", result);
       if (!result.ok) {
         Alert.alert("Fail to sign up", result.error.message);
         return;

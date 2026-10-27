@@ -36,7 +36,6 @@ export const login = async (payload: LoginUser): Promise<ApiResult<UserSession |
         }
 
         const loggedUser: UserSession = await response.json();
-        console.log("response", response)
         return {
             ok: true,
             data: loggedUser

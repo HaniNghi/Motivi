@@ -252,3 +252,9 @@ This version appears to trigger a runtime environment problem on this machine, c
 The likely fix is to switch to a stable LTS Node version such as 22 or 20 and reinstall npm tools in a clean environment.
 
 This is a toolchain issue rather than a frontend code issue, so it must be resolved before `npx expo start` can work.
+
+
+## Restructure to Expo Router
+### Root cause
+- Align project with new way of navigation
+
