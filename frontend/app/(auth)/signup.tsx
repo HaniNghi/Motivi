@@ -37,62 +37,68 @@ export default function Signup() {
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const getPasswordError = () => {
-    setPwErrorMessage("");
-    setConfirmPwErrorMessage("");
+  const handleFullNameChange = (fullName: string) => {
+    setFullName(fullName);
+
+    if (fullnameErrorMessage) {
+      setFullnameErrorMessage("");
+    }
+  }
+
+  const handleFullNameBlur = () => {
+    if (!fullName.trim()) {
+      setFullnameErrorMessage("Full name cannot be empty.");
+    }
+  }
+
+  const handleEmailChange = (email: string) => {
+    setEmail(email);
+    if (emailErrorMessage) {
+      setEmailErrorMessge("");
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (!email.trim()) {
+      setEmailErrorMessge("Email cannot be empty.");
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailErrorMessge("Please enter a valid email address.");
+    }
+  };
+
+  const handlePwChange = (pw: string) => {
+    setPassword(pw);
+    if (pwErrorMessage) {
+      setPwErrorMessage("");
+    }
+  };
+  const handlePwBlur = () => {
     if (!password.trim()) {
-      setPwErrorMessage("Cannot leave empty field.");
-      return;
+      setPwErrorMessage("Password cannot be empty.");
+    } else if (password.trim().length < 8) {
+      setPwErrorMessage("Password must be at least 8 characters.");
     }
+  };
+
+  const handleConfirmPwChange = (pw: string) => {
+    setConfirmPassword(pw);
+    if (confirmPwErrorMessage) {
+      setConfirmPwErrorMessage("");
+    }
+  };
+  const handleConfirmPwBlur = () => {
     if (!confirmPassword.trim()) {
-      setConfirmPwErrorMessage("Cannot leave empty field.");
-      return;
-    }
-    if (confirmPassword.trim() !== password.trim()) {
-      setConfirmPwErrorMessage("Password do not match.");
-      return;
-    }
-    if (
-      confirmPassword.trim() === password.trim() &&
-      password.trim().length < 8
-    ) {
-      setPwErrorMessage("At least 8 characters.");
-      setConfirmPwErrorMessage("At least 8 characters.");
-      return;
+      setConfirmPwErrorMessage("Confirm password cannot be empty.");
+    } else if (confirmPassword.trim() !== password) {
+      setConfirmPwErrorMessage("Confirm password does not match");
     }
   };
 
-  const getEmailError = () => {
-    setEmailErrorMessge("");
-    if (!email.trim() || email.trim().length === 0) {
-      setEmailErrorMessge("Cannot leave empty email.");
-      return;
-    }
-    if (!EMAIL_REGEX.test(email.trim())) {
-      setEmailErrorMessge("Invalid email.");
-      return;
-    }
-  };
-  const getFullnameError = () => {
-    setFullnameErrorMessage("");
-    if (fullName.trim() === "" || fullName.trim().length === 0) {
-      setFullnameErrorMessage("Cannot leave empty full name.");
-      return;
-    }
-  };
-
-  const resetErrorMessage = () => {
-    setFullnameErrorMessage("");
-    setEmailErrorMessge("");
-    setPwErrorMessage("");
-    setConfirmPwErrorMessage("");
-  };
-
-  const isValid = () :boolean => {
-    getFullnameError();
-    getEmailError();
-    getPasswordError();
-    if (fullnameErrorMessage || emailErrorMessage || pwErrorMessage || confirmPwErrorMessage) {
+  const isValid = (): boolean => {
+    if (!fullName || !email.trim() ||
+    !EMAIL_REGEX.test(email.trim()) ||
+    password.trim().length < 8 ||
+    confirmPassword !== password) {
       return false;
     } else {
       return true;
@@ -100,9 +106,12 @@ export default function Signup() {
   }
 
   const handleCreateAccount = async () => {
-    resetErrorMessage();
-    if (!isValid()
-    ) {
+    handleFullNameBlur();
+    handleEmailBlur();
+    handlePwBlur();
+    handleConfirmPwBlur();
+
+    if (!isValid()) {
       return;
     } else {
       const createUserPayload: CreateUser = {
@@ -143,7 +152,8 @@ export default function Signup() {
                 placeholder="Isabella Smith"
                 placeholderTextColor={colors.textSoft}
                 value={fullName}
-                onChangeText={(value) => setFullName(value)}
+                onChangeText={(value) => handleFullNameChange(value)}
+                onBlur={handleFullNameBlur}
               />
               {fullnameErrorMessage ? (
                 <Text style={styles.errorText}>{fullnameErrorMessage}</Text>
@@ -156,7 +166,8 @@ export default function Signup() {
                 placeholder="example@gmail.com"
                 placeholderTextColor={colors.textSoft}
                 value={email}
-                onChangeText={(value) => setEmail(value)}
+                onChangeText={(value) => handleEmailChange(value)}
+                onBlur={handleEmailBlur}
               />
               {emailErrorMessage ? (
                 <Text style={styles.errorText}>{emailErrorMessage}</Text>
@@ -171,7 +182,8 @@ export default function Signup() {
                   placeholder="••••••••"
                   placeholderTextColor={colors.textSoft}
                   value={password}
-                  onChangeText={(value) => setPassword(value)}
+                  onChangeText={(value) => handlePwChange(value)}
+                  onBlur={handlePwBlur}
                 />
                 <TouchableOpacity
                   style={styles.icon}
@@ -201,7 +213,8 @@ export default function Signup() {
                   placeholder="••••••••"
                   placeholderTextColor={colors.textSoft}
                   value={confirmPassword}
-                  onChangeText={(value) => setConfirmPassword(value)}
+                  onChangeText={(value) => handleConfirmPwChange(value)}
+                  onBlur={handleConfirmPwBlur}
                 />
                 <TouchableOpacity
                   style={styles.icon}

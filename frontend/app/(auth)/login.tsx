@@ -32,44 +32,46 @@ export default function Login() {
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const getPasswordError = () => {
-    setPwErrorMessage('');
-
-    if (password.trim() === '' || password.trim().length === 0) {
-      setPwErrorMessage('Cannot leave empty password.');
-      return;
+  const handleEmailChange = (email: string) => {
+    setEmail(email);
+    if (emailErrorMessage) {
+      setEmailErrorMessge("");
     }
+  };
 
-    if (password.trim().length < 8) {
-      setPwErrorMessage('At least 8 characters.');
-      return;
+  const handleEmailBlur = () => {
+    if (!email.trim()) {
+      setEmailErrorMessge("Email cannot be empty.");
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailErrorMessge("Please enter a valid email address.");
     }
+  };
+
+  const handlePwChange = (pw: string) => {
+    setPassword(pw);
+    if (pwErrorMessage) {
+      setPwErrorMessage("");
+    }
+  };
+  const handlePwBlur = () => {
+    if (!password.trim()) {
+      setPwErrorMessage("Password cannot be empty.");
+    } else if (password.trim().length < 8) {
+      setPwErrorMessage("Password must be at least 8 characters.");
+    }
+  };
+  
+  const isValid = (): boolean => {
+    if (!email.trim() || !EMAIL_REGEX.test(email.trim()) || password.trim().length < 8) {
+      return false;
+    } else return true;
   }
-
-  const getEmailError = () => {
-    setEmailErrorMessge('');
-
-    if (email.trim() === '' || email.trim().length === 0) {
-      setEmailErrorMessge('Cannot leave empty email.');
-      return;
-    }
-    if (!EMAIL_REGEX.test(email.trim())) {
-      setEmailErrorMessge('Invalid email.');
-      return;
-    }
-  }
-
-  const resetErrorMessage = () => {
-    setEmailErrorMessge('');
-    setPwErrorMessage('');
-  }
-
+  
   const handleLogin = async () => {
-    resetErrorMessage();
-    getEmailError();
-    getPasswordError();
+    handleEmailBlur();
+    handlePwBlur();
 
-    if (emailErrorMessage || pwErrorMessage) {
+    if (!isValid()) {
       return;
     } else {
       const payload: LoginUser = {
@@ -115,7 +117,8 @@ export default function Login() {
                 placeholder="example@gmail.com"
                 placeholderTextColor={colors.textSoft}
                 value={email}
-                onChangeText={(value) => setEmail(value)}
+                onChangeText={(value) => handleEmailChange(value)}
+                onBlur={handleEmailBlur}
               />
               {emailErrorMessage ? <Text style={styles.errorText}>{emailErrorMessage}</Text> : null}
             </View>
@@ -128,7 +131,8 @@ export default function Login() {
                   placeholder="••••••••"
                   placeholderTextColor={colors.textSoft}
                   value={password}
-                  onChangeText={(value) => setPassword(value)}
+                  onChangeText={(value) => handlePwChange(value)}
+                  onBlur={handlePwBlur}
                 />
                 <TouchableOpacity
                   style={styles.icon}
