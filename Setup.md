@@ -298,4 +298,79 @@ docker compose exec backend flask --app app:create_app db upgrade
 - If Alembic says `No changes in schema detected`, it usually means the database already matches your model definition.
 - If the database does not exist or the app cannot connect, the migration command will fail before creating a new revision.
 
-This is the full flow: create folders -> create venv -> install dependencies -> create app structure -> create Docker config -> start services -> initialize Alembic -> generate migrations -> apply migrations.
+16-Frontend testing setup (Jest + React Native Testing Library)
+
+To set up unit and component testing for the Expo React Native app:
+
+1. Install testing packages in the `frontend` folder (ensure `jest-expo` version matches your Expo SDK version, e.g. SDK 57):
+
+```bash
+cd frontend
+npm install --save-dev jest-expo@~57.0.0 jest @testing-library/react-native @types/jest --legacy-peer-deps
+```
+
+2. Add the test script in `frontend/package.json`:
+
+```json
+"scripts": {
+  "start": "expo start",
+  "android": "expo start --android",
+  "ios": "expo start --ios",
+  "web": "expo start --web",
+  "test": "jest"
+}
+```
+
+3. Update `frontend/tsconfig.json` to load Jest's global types:
+
+```json
+{
+  "extends": "expo/tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["jest"]
+  }
+}
+```
+
+4. Create `frontend/jest.config.js`:
+
+```js
+module.exports = {
+  preset: 'jest-expo',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  transformIgnorePatterns: [
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)',
+  ],
+};
+```
+
+5. Create `frontend/jest.setup.js` for global mocks:
+
+```js
+// Mock SafeAreaContext so components wrapped in <SafeAreaProvider> render in tests
+const mockSafeAreaContext = require('react-native-safe-area-context/jest/mock').default;
+jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
+```
+
+17-Running tests
+
+Run frontend tests (Jest):
+
+```bash
+cd frontend
+npm test                 # Run all tests once
+npm test -- --watch      # Run in interactive watch mode
+npm test -- --coverage   # Generate test coverage report
+```
+
+Run backend tests (Pytest):
+
+```bash
+cd backend
+source .venv/bin/activate
+pytest                   # Run all backend tests
+
+# Or run via Docker:
+# docker compose exec backend pytest
+```
