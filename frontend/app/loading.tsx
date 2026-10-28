@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   ScrollView,
@@ -16,9 +17,9 @@ import { useRouter } from "expo-router";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-export default function Loading() {
+export default function Loading({spinner = false} : {spinner?: boolean}) {
   const router = useRouter();
-  const logoSize = screenWidth*0.4;
+  const logoSize = screenWidth * 0.4;
 
   return (
     <SafeAreaProvider>
@@ -38,12 +39,18 @@ export default function Loading() {
             </View>
             <Text style={styles.splashTitle}>Motivi</Text>
             <Text style={styles.splashSubTitle}>Eat with intention</Text>
-            <TouchableOpacity
-              style={{ marginTop: 40 }}
-              onPress={() => router.push("/login")}
-            >
-              <Text style={styles.link}>Go to log in</Text>
-            </TouchableOpacity>
+
+
+            { spinner ? (<ActivityIndicator size="small" color={colors.textMuted} />)
+             : 
+              (<TouchableOpacity
+                style={{ marginTop: 40 }}
+                onPress={() => router.push("/login")}
+              >
+                <Text style={styles.link}>Go to log in</Text>
+              </TouchableOpacity>)
+            }
+
           </View>
         </LinearGradient>
       </SafeAreaView>
@@ -75,12 +82,12 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans-Bold'
   },
   splashSubTitle: {
-    fontSize:20,
+    fontSize: 20,
     color: colors.textSoft,
     fontFamily: 'PlusJakartaSans-Regular'
   },
-  link:{
-    fontSize:15,
+  link: {
+    fontSize: 15,
     color: colors.textMuted,
     fontFamily: 'PlusJakartaSans-Regular'
   }

@@ -11,6 +11,16 @@ const keys = {
     overflow: 'hidden' as const,
     boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
   },
+  nonClickedButton: {
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    backgroundColor: colors.buttonSecondary,
+    borderColor: colors.border,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    overflow: 'hidden' as const,
+    borderWidth: 1.5,
+  },
   primaryButtonText: {
     color: colors.textWhite,
     fontFamily: 'PlusJakartaSans-Bold',
@@ -56,6 +66,8 @@ const keys = {
   },
   heroCard: {
     padding: 16,
+    marginTop: 10,
+    marginBottom: 10,
     borderRadius: 28,
     backgroundColor: '#ffffff',
     borderWidth: 1,
