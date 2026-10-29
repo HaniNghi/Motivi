@@ -21,6 +21,7 @@ import { ApiError, CreateUser } from "../../lib/types";
 import { useRouter } from "expo-router";
 import WhiteContainer from "../../components/WhiteContainer";
 import SmallGradientButton from "../../components/SmallGradientButton";
+import IconContentButton from "../../components/IconContentButton";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Signup() {
@@ -117,14 +118,9 @@ export default function Signup() {
             </WhiteContainer>
             <WhiteContainer title="GOAL" width="90%">
               <View style={styles.form}>
-                <View style={styles.input}>
-                  <Text style={styles.inputLabel}>Full name</Text>
-                  <TextInput
-                    style={styles.inputControl}
-                    placeholder="Isabella Smith"
-                    placeholderTextColor={colors.textSoft}
-                  />
-                </View>
+                <IconContentButton mainTitle="Lose weight" subTitle="Calorie deficit" icon="trending-down" clicked={true}/>
+                <IconContentButton mainTitle="Maintain weight" subTitle="Stay balance" icon="barbell" clicked={false}/>
+                <IconContentButton mainTitle="Gain weight" subTitle="Calorie surplus" icon="trending-up" clicked={false}/>
               </View>
             </WhiteContainer>
           </View>
@@ -173,7 +169,7 @@ const styles = StyleSheet.create({
     width: "95%",
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    padding: 10,
+    paddingTop: 10,
     alignContent: 'space-between'
   },
   inputLabel: {
@@ -181,7 +177,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlusJakartaSans-Medium",
     marginTop: 15,
     margin: 10,
-    fontSize: 15,
+    fontSize: 14,
   },
   inputControl: {
     fontFamily: "PlusJakartaSans-Regular",
@@ -193,7 +189,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: 12,
     padding: 16,
-    fontSize: 15,
+    fontSize: 12,
   },
   inRow: {
     width: "50%",
@@ -201,8 +197,7 @@ const styles = StyleSheet.create({
   form: {
     alignSelf: "center",
     width: "100%",
-    paddingTop: 10,
-    paddingBottom: 16,
+    paddingBottom: 5,
   },
   btnContainer: {
     width: "100%",

@@ -42,6 +42,7 @@ const colors = {
   heroOverlay: 'rgba(99,102,241,0.30)',
   featureOverlayStart: 'rgba(99,102,241,0.82)',
   featureOverlayEnd: 'rgba(139,92,246,0.60)',
+  selectedGoalTint2: 'rgba(139,92,246,0.08)',
   selectedGoalTint: 'rgba(99,102,241,0.08)',
   logoutBg: 'rgba(239,68,68,0.06)',
 

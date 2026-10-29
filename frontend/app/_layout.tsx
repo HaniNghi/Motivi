@@ -8,6 +8,7 @@ import { AuthProvider } from "../context/AuthContext";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
+    "PlusJakartaSans": require("../assets/fonts/PlusJakartaSans-VariableFont_wght.ttf"),
     "PlusJakartaSans-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
     "PlusJakartaSans-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
     "PlusJakartaSans-ExtraBold": require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
