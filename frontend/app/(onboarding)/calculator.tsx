@@ -49,11 +49,11 @@ export default function Signup() {
     const num = Number(age);
 
     if (!age.trim()) {
-      setHeightErrorMessage("Age cannot be empty.");
+      setAgeErrorMessage("Age cannot be empty.");
     } else if (isNaN(num)) {
-      setHeightErrorMessage("Age must be a number.");
+      setAgeErrorMessage("Age must be a number.");
     } else if (num < 14 || num > 100 ) {
-      setHeightErrorMessage("Age must be between 14 and 100.");
+      setAgeErrorMessage("Age must be between 14 and 100.");
     }
   };
 
