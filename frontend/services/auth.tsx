@@ -13,7 +13,7 @@ export const createUser = async (payload: CreateUser): Promise<UserSession> => {
         const response = await callApi("POST", "/auth/register", payload);
         if (!response.ok) {
             const err = await handleError(response);
-            throw new Error(err.message);
+            throw err;
         }
         const newUser: UserSession = await response.json();
         return newUser;
@@ -27,7 +27,7 @@ export const loginUser = async (payload: LoginUser): Promise<UserSession> => {
         const response = await callApi("POST", "/auth/login", payload);
         if (!response.ok) {
             const err = await handleError(response);
-            throw new Error(err.message);
+            throw err;
         }
 
         const loggedUser: UserSession = await response.json();

@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -14,11 +15,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { createUser } from "../../services/auth";
-import { ActiveLevel, ApiError, CreateUser, Gender, Goal } from "../../lib/types";
+import { ActiveLevel, ApiError, CreateProfile, CreateUser, Gender, Goal } from "../../lib/types";
 import { useRouter } from "expo-router";
 import WhiteContainer from "../../components/WhiteContainer";
 import SmallGradientButton from "../../components/SmallGradientButton";
 import IconContentButton from "../../components/IconContentButton";
+import { postProfile } from "../../services/me";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Signup() {
@@ -105,7 +107,7 @@ const isAgeValid = (): boolean =>{
   }
 
   const isValid = (): boolean => {
-    if(!isAgeValid || !gender || !isHeightValid || !isWeightValid || !activity || !goal) {
+    if(!isAgeValid() || !gender || !isHeightValid() || !isWeightValid() || !activity || !goal) {
       return false;
     }
     return true;
@@ -131,21 +133,33 @@ const isAgeValid = (): boolean =>{
     }
   }
 
-const handleCalculator = () => {
+const handleCalculator = async () => {
     handleAgeBlur();
     handleHeightBlur();
     handleWeightBlur();
 
-    if (!isValid) {
+    if (!isValid()) {
       return;
     } else {
-      const payloadPostMe = {
-        age: age,
+      const payloadPostMe: CreateProfile = {
+        age: Number(age),
         gender: gender,
-        height_cm: height,
-        weight_cm: weight,
+        height_cm: Number(height),
+        weight_kg: Number(weight),
         activity_level: activity,
         goal: goal,
+      }
+      console.log("payloadPostMe", payloadPostMe)
+
+      try {
+        const result = await postProfile(payloadPostMe);
+        if (result) {
+          Alert.alert("Success", "Profile created")
+          router.dismissTo("/(tabs)")
+        }
+      } catch (error: any) {
+        console.log(error)
+        Alert.alert("Fail to create profile",  error.message);
       }
     }
   }
@@ -311,6 +325,7 @@ const handleCalculator = () => {
                 { alignSelf: "center", width: "90%" },
               ]}
               activeOpacity={0.8}
+              onPress={handleCalculator}
             >
               <LinearGradient
                 colors={colors.primaryGradient}

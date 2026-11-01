@@ -63,3 +63,12 @@ export interface Profile {
     tdee: number,
     weight_cm: number
 }
+
+export interface CreateProfile {
+    age: number,
+    gender: Gender,
+    height_cm: number,
+    weight_kg: number
+    activity_level: ActiveLevel,
+    goal: Goal,
+}
