@@ -149,7 +149,6 @@ const handleCalculator = async () => {
         activity_level: activity,
         goal: goal,
       }
-      console.log("payloadPostMe", payloadPostMe)
 
       try {
         const result = await postProfile(payloadPostMe);
@@ -158,7 +157,6 @@ const handleCalculator = async () => {
           router.dismissTo("/(tabs)")
         }
       } catch (error: any) {
-        console.log(error)
         Alert.alert("Fail to create profile",  error.message);
       }
     }

@@ -38,7 +38,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
             isRefreshingPromise = null;
         }
     })();
-    console.log("isRefreshingPromise", isRefreshingPromise)
 
     return isRefreshingPromise;
 };
@@ -46,7 +45,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 export const handleError = async (errorResponse: any): Promise<any> => {
     try {
         const error = await errorResponse.json();
-        console.log(error)
         return {
             code: error?.error?.code,
             message: error?.error?.message,
@@ -86,10 +84,8 @@ export const callApi = async (
                 : undefined,
     });
 
-    console.log("response1", response)
     if (auth && response.status === 401) {
         const newToken = await refreshAccessToken();
-        console.log("newToken", newToken)
         headers.Authorization = `Bearer ${newToken}`;
 
         response = await fetch(`${API_URL}${endpoint}`, {
@@ -104,7 +100,5 @@ export const callApi = async (
                     : undefined,
         });
     }
-    console.log("response2", response)
-
     return response;
 };
