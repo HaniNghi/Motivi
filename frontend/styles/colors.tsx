@@ -42,8 +42,10 @@ const colors = {
   heroOverlay: 'rgba(99,102,241,0.30)',
   featureOverlayStart: 'rgba(99,102,241,0.82)',
   featureOverlayEnd: 'rgba(139,92,246,0.60)',
-  selectedGoalTint2: 'rgba(139,92,246,0.08)',
+  redTint2: 'rgba(246, 92, 92, 0.4)',
+  redTint: 'rgba(246, 92, 92, 0.08)',
   selectedGoalTint: 'rgba(99,102,241,0.08)',
+  selectedGoalTint2: 'rgba(100, 102, 221, 0.1)',
   logoutBg: 'rgba(239,68,68,0.06)',
 
   // Gradients

@@ -17,7 +17,7 @@ export default function App() {
   });
 
   if (!fontsLoaded) {
-    return null; // Render loading screen or splash screen until fonts load
+    return null;
   }
 
   return (

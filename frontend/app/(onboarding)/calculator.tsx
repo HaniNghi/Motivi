@@ -20,11 +20,14 @@ import { useRouter } from "expo-router";
 import WhiteContainer from "../../components/WhiteContainer";
 import SmallGradientButton from "../../components/SmallGradientButton";
 import IconContentButton from "../../components/IconContentButton";
-import { postProfile } from "../../services/me";
+import { editProfile, postProfile } from "../../services/me";
+import { useAuth } from "../../context/AuthContext";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Signup() {
   const router = useRouter();
+
+  const { refreshMe } = useAuth(); 
 
   const [age, setAge] = useState("");
   const [ageErrorMessage, setAgeErrorMessage] = useState("");
@@ -133,34 +136,49 @@ const isAgeValid = (): boolean =>{
     }
   }
 
-const handleCalculator = async () => {
+  const handleCalculator = async () => {
     handleAgeBlur();
     handleHeightBlur();
     handleWeightBlur();
 
     if (!isValid()) {
       return;
-    } else {
-      const payloadPostMe: CreateProfile = {
-        age: Number(age),
-        gender: gender,
-        height_cm: Number(height),
-        weight_kg: Number(weight),
-        activity_level: activity,
-        goal: goal,
-      }
-
-      try {
-        const result = await postProfile(payloadPostMe);
-        if (result) {
-          Alert.alert("Success", "Profile created")
-          router.dismissTo("/(tabs)")
-        }
-      } catch (error: any) {
-        Alert.alert("Fail to create profile",  error.message);
-      }
     }
-  }
+
+    const payloadPostMe: CreateProfile = {
+      age: Number(age),
+      gender: gender,
+      height_cm: Number(height),
+      weight_kg: Number(weight),
+      activity_level: activity,
+      goal: goal,
+    };
+
+    try {
+      const result = await postProfile(payloadPostMe);
+      if (result) {
+        await refreshMe();
+        Alert.alert("Success", "Profile created");
+        router.replace("/result");
+      }
+    } catch (error: any) {
+      if (error.code === "profile_exists" || error.message === "Profile already exists.") {
+        try {
+          const result = await editProfile(payloadPostMe);
+          if (result) {
+            await refreshMe();
+            Alert.alert("Success", "Profile updated");
+            router.replace("/result");
+            return;
+          }
+        } catch (editError: any) {
+          Alert.alert("Fail to edit profile", editError.message);
+          return;
+        }
+      }
+      Alert.alert("Fail to create profile", error.message);
+    }
+  };
 
 
   return (

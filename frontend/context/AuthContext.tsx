@@ -11,26 +11,37 @@ import {
     CreateUser,
     LoginUser,
     MeSession,
+    Profile,
     User,
     UserSession,
 } from "../lib/types";
-import { getAccessToken, getUser, saveSession } from "../lib/storage";
+import {
+    clearSession,
+    getAccessToken,
+    getProfile,
+    getUser,
+    saveProfile,
+    saveSession,
+} from "../lib/storage";
 import { getMe } from "../services/me";
 import { router } from "expo-router";
 
 type AuthState = {
     loading: boolean;
     user: User | null;
+    profile: Profile | null;
     onboardingCompleted: boolean;
     login: (session: UserSession | any) => Promise<void>;
     logout: () => Promise<void>;
     refreshMe: () => Promise<MeSession | null>;
+    setProfile: (profile: Profile | null) => void;
 };
 
 export const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
     const [onboardingCompleted, setOnboardingCompleted] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -38,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = await getAccessToken();
         if (!token) {
             setUser(null);
+            setProfile(null);
             setOnboardingCompleted(false);
             return null;
         }
@@ -45,18 +57,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const me = await getMe();
             setUser(me.user);
             setOnboardingCompleted(me.onboarding_completed);
+            if (me.profile) {
+                setProfile(me.profile);
+                await saveProfile(me.profile);
+            }
             return me;
         } catch (error) {
-            setUser(null)
-            setOnboardingCompleted(false)
+            setUser(null);
+            setProfile(null);
+            setOnboardingCompleted(false);
             return null;
-        };
+        }
     }, []);
 
     useEffect(() => {
         (async () => {
-            const stored = await getUser();
-            if (stored) setUser(stored);
+            const [storedUser, storedProfile] = await Promise.all([
+                getUser(),
+                getProfile(),
+            ]);
+            if (storedUser) setUser(storedUser);
+            if (storedProfile) setProfile(storedProfile);
             await refreshMe();
             setLoading(false);
         })();
@@ -74,18 +95,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const me = await refreshMe();
         //completed, navigate to tabs
         if (me?.onboarding_completed) {
-            router.replace("/(tabs)")
+            router.replace("/(tabs)");
         } 
         //incompleted, navigate to onboarding
         else {
-            router.replace("/(onboarding)/calculator")
+            router.replace("/(onboarding)/calculator");
         }
+    }, [refreshMe]);
+
+    const logout = useCallback(async () => {
+        await clearSession();
+        setUser(null);
+        setProfile(null);
+        setOnboardingCompleted(false);
+        router.replace("/(auth)/login");
     }, []);
 
-    const logout = useCallback(async () => { }, []);
-
     return (
-        <AuthContext.Provider value={{ loading, user, onboardingCompleted, login, logout, refreshMe }}>
+        <AuthContext.Provider
+            value={{
+                loading,
+                user,
+                profile,
+                onboardingCompleted,
+                login,
+                logout,
+                refreshMe,
+                setProfile,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

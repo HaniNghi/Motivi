@@ -28,3 +28,17 @@ export async function postProfile(payload: CreateProfile): Promise<MeSession>{
         throw error;
     }
 }
+
+export async function editProfile(payload: CreateProfile): Promise<MeSession>{
+    try {
+        const response = await callApi("PUT", "/me", payload, true)
+        if (!response.ok) {
+            const err = await handleError(response);
+            throw err;
+        }
+        const newProfile: MeSession = await response.json();
+        return newProfile;
+    } catch (error: any) {
+        throw error;
+    }
+}
