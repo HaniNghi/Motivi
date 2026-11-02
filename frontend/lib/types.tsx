@@ -72,3 +72,14 @@ export interface CreateProfile {
     activity_level: ActiveLevel,
     goal: Goal,
 }
+
+export interface Entry {
+
+}
+export interface DiaryDaySession {
+    "date": string,
+    "target": any,
+    "consumed": any,
+    "remaining": any,
+    "entries": any
+}

@@ -10,6 +10,10 @@ export function getDatetime(date = new Date()): Date {
   return date;
 }
 
+export function getDate(date = new Date()): string {
+  return date.toISOString().split('T')[0];
+}
+
 export function prettierDatetime(date = new Date()): string {
   return date.toLocaleDateString("en-GB", {
     weekday: "long",

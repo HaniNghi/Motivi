@@ -2,34 +2,47 @@ import { Text, View, StyleSheet, Dimensions, Image } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import colors from "../../styles/colors";
 import { useEffect, useState } from "react";
-import { getGreeting, prettierDatetime } from "../../lib/utils";
+import { getDate, getGreeting, prettierDatetime } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
 import WhiteContainer from "../../components/WhiteContainer";
 import CircleIndicator from "../../components/CircleIndicator";
 import CalorieInfo from "../../components/CalorieInfo";
+import { getDiaryDay } from "../../services/diary";
+import { DiaryDaySession } from "../../lib/types";
 const screenWidth = Dimensions.get("window").width;
 
 export default function Home() {
   const { user, profile } = useAuth();
+
+  const [date, setDate] = useState(getDate());
   const [prettyDt, setPrettyDt] = useState(prettierDatetime());
   const [greeting, setGreeting] = useState(getGreeting());
+  const [diaryDay, setDiaryDay] = useState<DiaryDaySession>();
+  const [errorMsg, setErrorMsg] = useState<string>();
 
   const targetCalorie = Number(profile?.tdee) ?? 0;
+
+  const fetchDiaryDay = async () => {
+    try {
+      const result = await getDiaryDay(date);
+      setDiaryDay(result);
+    } catch (error: any) {
+      setErrorMsg(`${error.code} ${error.message}`)
+    }
+  };
 
   useEffect(() => {
     let secTimer = setInterval(() => {
       setGreeting(getGreeting());
       setPrettyDt(prettierDatetime());
+      setDate(getDate());
     }, 60000);
+
+    fetchDiaryDay();
+    console.log("diaryDay", diaryDay)
+
     return () => clearInterval(secTimer);
   }, []);
-
-  const greetings = new Map<string, string>([
-    ["12:00", "Good morning"],
-    ["16:00", "Good afternoon"],
-    ["19:00", "Good evening"],
-    ["00:00", "Good night"],
-  ]);
 
   return (
     <SafeAreaProvider>
@@ -39,7 +52,7 @@ export default function Home() {
             <Text style={styles.welcomeText}>
               {greeting}, {user?.display_name}👋
             </Text>
-            <Text style={styles.subText}>{prettyDt}</Text>
+            <Text style={styles.subText}>{date}</Text>
           </View>
           <Image
             style={styles.logo}
@@ -49,7 +62,7 @@ export default function Home() {
         <View>
           <WhiteContainer width={"95%"}>
             <View>
-              <CircleIndicator max={targetCalorie} value={1000} />
+              <CircleIndicator max={targetCalorie} value={diaryDay?.consumed.calories} />
               <CalorieInfo />
             </View>
           </WhiteContainer>
