@@ -11,42 +11,78 @@ import keys from "../styles/keys";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import CircleResult from "../components/CircleResult";
+import SmallWhiteCard from "../components/SmallWhiteCard";
 
 const screenWidth = Dimensions.get("window").width;
 export default function Signup() {
   const router = useRouter();
 
-  const { profile } = useAuth(); 
+  const { profile } = useAuth();
 
+  const handleGoToHome = async () => {
+    router.replace("/(tabs)");
+  };
 
-
-const handleGoToHome = async () => {
-    router.replace("/(tabs)")
+  const handleRecalculate = async () => {
+    router.push("/(onboarding)/calculator")
   }
+
+  const activityLevels = new Map<string, string>([
+    ["sedentary", "sedentary"],
+    ["light", "light"],
+    ["moderate", "moderate"],
+    ["active", "active"],
+    ["very_active", "very active"],
+  ]);
+
+  const goal = profile?.goal ?? "";
+  const activity = profile?.activity_level
+    ? activityLevels.get(profile.activity_level)
+    : "";
+  const tdee: number = profile?.tdee ?? 0;
+  const age = profile?.age ? profile?.age.toString(): "";
+  const gender = profile?.gender === 'female' ? "Female": "Male";
+  const height = profile?.height_cm ? profile?.height_cm.toString(): "";
+  const weight = profile?.weight_kg ? profile?.weight_kg.toString(): "";
 
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
-          <Text>{profile?.tdee}</Text>
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[
-                keys.primaryButton,
-                { alignSelf: "center", width: "90%" },
-              ]}
-              activeOpacity={0.8}
-              onPress={handleGoToHome}
-            >
-              <LinearGradient
-                colors={colors.primaryGradient}
-                start={{ x: 0, y: 1 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={keys.primaryButtonText}>Continue</Text>
-            </TouchableOpacity>
+        <View style={styles.content}>
+          <Text style={styles.leadText}>YOUR DAILY CALORIE NEED</Text>
+          <CircleResult calorie={tdee}></CircleResult>
+          <Text style={styles.subText1}>
+            To <Text style={{fontFamily: "PlusJakartaSans-Bold"}}>{goal}</Text> weight at a {activity} activity level.
+          </Text>
+          <View style={styles.cardContainer}>
+            <SmallWhiteCard main={`${age} yrs`} sub="Age"/>
+            <SmallWhiteCard main={gender} sub="Gender"/>
+            <SmallWhiteCard main={`${height} cm`} sub="Height"/>
+            <SmallWhiteCard main={`${weight} kg`} sub="Weight"/>
           </View>
+        </View>
+
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={[keys.primaryButton, { alignSelf: "center", width: "90%" }]}
+            activeOpacity={0.8}
+            onPress={handleGoToHome}
+          >
+            <LinearGradient
+              colors={colors.primaryGradient}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 1, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />
+            <Text style={keys.primaryButtonText}>Continue To Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ alignSelf: "center", width: "90%"}} onPress={handleRecalculate}>
+            <Text style={[styles.subText2, {alignSelf: "center"}]}>Recalculate</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -59,118 +95,43 @@ const styles = StyleSheet.create({
     width: screenWidth,
     flex: 1,
   },
-  input: {
-    alignItems: "center",
-  },
-  inputBoxRow: {
-    flex: 1,
-    flexDirection: "row",
-    width: "95%",
-    justifyContent: "space-between",
-  },
-  activityRow: {
-    flex: 1,
-    flexDirection: "row",
-    width: "95%",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    paddingTop: 10,
-    alignContent: "space-between",
-  },
-  inputLabel: {
-    alignSelf: "flex-start",
-    fontFamily: "PlusJakartaSans-Medium",
-    marginTop: 15,
-    margin: 10,
-    fontSize: 14,
-  },
-  inputControl: {
-    fontFamily: "PlusJakartaSans-Regular",
-    alignSelf: "center",
-    width: "95%",
-    height: 52,
-    backgroundColor: colors.buttonSecondary,
-    borderColor: colors.border,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 12,
-  },
-  inRow: {
-    width: "50%",
-  },
-  form: {
-    alignSelf: "center",
-    width: "100%",
-    paddingBottom: 5,
-  },
+  
   btnContainer: {
     width: "100%",
     marginTop: 20,
+    paddingBottom: 20,
   },
-  gradient: {
-    flex: 1,
+  content: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1
   },
-  imageContainer: {
-    width: screenWidth,
-    backgroundColor: colors.page,
-    marginLeft: 20,
+  cardContainer: {
+    flexDirection: 'row',
+    width: '90%',
+    justifyContent: 'space-between',
     marginTop: 20,
   },
-  image: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
+  leadText: {
+    fontSize: 14,
+    fontWeight: 400,
+    color: colors.textSoft,
+    marginBottom: 16,
+    fontFamily: "PlusJakartaSans-Bold",
   },
-  welcomeText: {
-    fontSize: 28,
-    color: colors.text,
-    letterSpacing: -0.8,
-    fontFamily: "PlusJakartaSans-ExtraBold",
+  subText1: {
+    fontSize: 15,
+    fontWeight: 400,
+    color: colors.textMuted,
+    marginTop: 10,
+    fontFamily: "PlusJakartaSans-Regular",
   },
-  subText: {
+  subText2: {
     fontSize: 14,
     fontWeight: 400,
     color: colors.textMuted,
     marginTop: 10,
     fontFamily: "PlusJakartaSans-Regular",
   },
-  signupText: {
-    alignItems: "center",
-  },
-  signupLinkText: {
-    fontSize: 14,
-    color: colors.textMuted,
-    fontFamily: "PlusJakartaSans-Regular",
-  },
-  signupBoldText: {
-    color: colors.buttonPrimaryStart,
-    fontFamily: "PlusJakartaSans-Bold",
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: 10,
-    backgroundColor: colors.page,
-    marginTop: 10,
-    paddingTop: 0,
-  },
-  icon: {
-    position: "absolute",
-    right: 16,
-  },
-  passwordContainer: {
-    width: "100%",
-    height: 52,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  errorText: {
-    color: colors.danger,
-    alignSelf: "flex-start",
-    marginLeft: 10,
-  },
+ 
 });

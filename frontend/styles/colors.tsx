@@ -46,6 +46,7 @@ const colors = {
   redTint: 'rgba(246, 92, 92, 0.08)',
   selectedGoalTint: 'rgba(99,102,241,0.08)',
   selectedGoalTint2: 'rgba(100, 102, 221, 0.1)',
+  selectedGoalTint3: 'rgba(100, 102, 221, 0.4)',
   logoutBg: 'rgba(239,68,68,0.06)',
 
   // Gradients

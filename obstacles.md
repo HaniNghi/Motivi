@@ -258,3 +258,21 @@ This is a toolchain issue rather than a frontend code issue, so it must be resol
 ### Root cause
 - Align project with new way of navigation
 
+## Bug in backend weight_cm -> weight_kg
+### Root cause
+ typo in Profile model -> have to reset database and have to upgrade backend
+ docker compose down -v 
+Why -v? Without -v, Docker preserves your old database data and tables across restarts. -v wipes the db-data volume so PostgreSQL is brand new.
+
+ docker compose up -d
+
+ cd backend
+source .venv/bin/activate
+flask db upgrade
+flask run --port=5000
+
+  
+
+  
+
+  

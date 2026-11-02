@@ -50,7 +50,7 @@ def upgrade():
     sa.Column('age', sa.Integer(), nullable=False),
     sa.Column('gender', sa.String(length=16), nullable=False),
     sa.Column('height_cm', sa.Numeric(precision=6, scale=2), nullable=False),
-    sa.Column('weight_cm', sa.Numeric(precision=6, scale=2), nullable=False),
+    sa.Column('weight_kg', sa.Numeric(precision=6, scale=2), nullable=False),
     sa.Column('activity_level', sa.String(length=32), nullable=False),
     sa.Column('goal', sa.String(length=16), nullable=False),
     sa.Column('bmr', sa.Integer(), nullable=False),

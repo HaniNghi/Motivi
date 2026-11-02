@@ -21,7 +21,7 @@ class Profile(db.Model):
     age: Mapped[int] = mapped_column(Integer, nullable=False)
     gender: Mapped[str] = mapped_column(String(16), nullable=False)
     height_cm: Mapped[Decimal] = mapped_column(Numeric(6, 2), nullable=False)
-    weight_cm: Mapped[Decimal] = mapped_column(Numeric(6, 2), nullable=False)
+    weight_kg: Mapped[Decimal] = mapped_column(Numeric(6, 2), nullable=False)
     activity_level: Mapped[str] = mapped_column(String(32), nullable=False)
     goal: Mapped[str] = mapped_column(String(16), nullable=False)
     bmr: Mapped[int] = mapped_column(Integer, nullable=False)

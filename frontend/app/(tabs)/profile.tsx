@@ -109,7 +109,7 @@ export default function Profile() {
             />
             <CardImageContainer
               picLink={require("../../assets/weighing-scale.png")}
-              firstText={`${profile?.weight_cm ?? ""} kg`}
+              firstText={`${profile?.weight_kg ?? ""} kg`}
               secondText="Weight"
               width="45%"
             />

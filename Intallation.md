@@ -42,20 +42,3 @@ Open Terminal and run:
 docker --version
 docker run hello-world
 ```
-
-## Next steps: 
-1. Setup and run flask app + database (postgresql) via docker and docker compose by following examples 
-
-2. move code into the server
-
-
-
-user -> mobile (1)-> backend (2)-> database (3) -> open api 
-1) add cache (1)
-cache data in mobile
-for example: sang nhap com -> cache 
-chieu nhap com 
-toi nhap com 
-
-2) add cache (2)
-giua backend va db

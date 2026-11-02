@@ -61,7 +61,7 @@ export interface Profile {
     target_fat_g: number,
     target_protein_g: number,
     tdee: number,
-    weight_cm: number
+    weight_kg: number
 }
 
 export interface CreateProfile {

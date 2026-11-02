@@ -62,7 +62,13 @@ def create_app():
     register_error_handlers(app)
 
     with app.app_context():
-        count = seed_foods()
-        print(f"Seeded {count} foods.")
+        from sqlalchemy import inspect
+        try:
+            inspector = inspect(db.engine)
+            if inspector.has_table("foods"):
+                count = seed_foods()
+                print(f"Seeded {count} foods.")
+        except Exception:
+            pass
 
     return app

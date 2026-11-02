@@ -16,7 +16,7 @@ def dump_profile(profile: Profile | None) -> dict | None:
         "age": profile.age,
         "gender": profile.gender,
         "height_cm": float(profile.height_cm),
-        "weight_cm": float(profile.weight_cm),
+        "weight_kg": float(profile.weight_kg),
         "activity_level": profile.activity_level,
         "goal": profile.goal,
         "bmr": profile.bmr,
@@ -48,7 +48,7 @@ def apply_profile_fields(profile: Profile, data: dict) -> None:
     profile.age = data["age"]
     profile.gender = data["gender"]
     profile.height_cm = data["height_cm"]
-    profile.weight_cm = data["weight_kg"]
+    profile.weight_kg = data["weight_kg"]
     profile.activity_level = data["activity_level"]
     profile.goal = data["goal"]
     profile.bmr = targets["bmr"]
