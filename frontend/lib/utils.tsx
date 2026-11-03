@@ -23,6 +23,14 @@ export function prettierDatetime(date = new Date()): string {
   });
 }
 
+export function shortDatetime(date = new Date()): string {
+  return date.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
+}
+
 export function getGreeting(date = new Date()): string {
   const currentHour = date.getHours();
   const match = GREETINGS.find((slot) => currentHour < slot.untilHour);
