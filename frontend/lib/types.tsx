@@ -90,7 +90,8 @@ export interface Entry {
     calories: number,
     protein_g: number,
     carbs_g: number,
-    fat_g: number
+    fat_g: number,
+    image_url?: string | null
 }
 export interface DiaryDaySession {
     "date": string,
