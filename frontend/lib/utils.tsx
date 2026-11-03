@@ -28,3 +28,7 @@ export function getGreeting(date = new Date()): string {
   const match = GREETINGS.find((slot) => currentHour < slot.untilHour);
   return match?.text ?? "Hello";
 }
+
+export function addComma(number: number): string {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

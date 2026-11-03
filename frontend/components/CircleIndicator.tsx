@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import colors from "../styles/colors";
+import { addComma } from "../lib/utils";
 
 interface CircleIndicatorProps {
   value: number;
@@ -13,8 +14,8 @@ interface CircleIndicatorProps {
 export default function CircleIndicator({
   value,
   max,
-  size = 200,
-  strokeWidth = 15,
+  size = 150,
+  strokeWidth = 12,
 }: CircleIndicatorProps) {
   const safeValue = Math.min(value, max);
   const progress = max > 0 ? safeValue / max : 0;
@@ -24,7 +25,7 @@ export default function CircleIndicator({
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <View style={{ width: size, height: size, alignSelf: "center" }}>
+    <View style={{ width: size, height: size, alignSelf: "center", justifyContent: 'center' }}>
       <Svg width={size} height={size}>
         <Defs>
           <LinearGradient
@@ -66,8 +67,8 @@ export default function CircleIndicator({
 
       {/* Text */}
       <View style={styles.textContainer}>
-        <Text style={styles.value}>{value.toLocaleString("vi-VN")}</Text>
-        <Text style={styles.label}>kcal/day</Text>
+        <Text style={styles.value}>{addComma(value)}</Text>
+        <Text style={styles.label}>kcal eaten</Text>
       </View>
     </View>
   );
@@ -76,13 +77,11 @@ export default function CircleIndicator({
 const styles = StyleSheet.create({
   textContainer: {
     position: "absolute",
-    top: "40%",
-    left: 0,
-    right: 0,
     alignItems: "center",
+    alignSelf: 'center',
   },
   value: {
-    color: "white",
+    color: colors.text,
     fontSize: 32,
     fontWeight: "600",
   },

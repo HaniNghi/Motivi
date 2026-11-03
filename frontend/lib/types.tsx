@@ -1,3 +1,5 @@
+import { StringWithAutocomplete } from "@testing-library/react-native/dist/types";
+
 export type ApiResult<UserSession> =
   | { ok: true; data: UserSession }
   | { ok: false; error: { code: string; message: string } };
@@ -73,13 +75,27 @@ export interface CreateProfile {
     goal: Goal,
 }
 
-export interface Entry {
+export interface NutritionTotals {
+    calories: number,
+    protein_g: number,
+    carbs_g: number,
+    fat_g: number
+}
 
+export interface Entry {
+    id: string,
+    food_id: string,
+    food_name: string,
+    amount_g: number,
+    calories: number,
+    protein_g: number,
+    carbs_g: number,
+    fat_g: number
 }
 export interface DiaryDaySession {
     "date": string,
-    "target": any,
-    "consumed": any,
-    "remaining": any,
-    "entries": any
+    "target": NutritionTotals,
+    "consumed": NutritionTotals,
+    "remaining": NutritionTotals,
+    "entries": Entry[]
 }

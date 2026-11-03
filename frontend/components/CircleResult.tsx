@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../styles/colors";
+import { addComma } from "../lib/utils";
 
 interface CircleResultProps {
   calorie: number;
@@ -7,7 +8,7 @@ interface CircleResultProps {
 
 export default function CircleResult({ calorie }: CircleResultProps) {
 
-  const calorieString = calorie.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const calorieString = addComma(calorie);
   return (
     <View style={styles.circle}>
       <Text style={styles.calorieText}>{calorieString}</Text>

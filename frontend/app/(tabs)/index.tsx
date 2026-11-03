@@ -1,14 +1,16 @@
-import { Text, View, StyleSheet, Dimensions, Image } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import colors from "../../styles/colors";
-import { useEffect, useState } from "react";
-import { getDate, getGreeting, prettierDatetime } from "../../lib/utils";
-import { useAuth } from "../../context/AuthContext";
-import WhiteContainer from "../../components/WhiteContainer";
-import CircleIndicator from "../../components/CircleIndicator";
 import CalorieInfo from "../../components/CalorieInfo";
-import { getDiaryDay } from "../../services/diary";
+import CircleIndicator from "../../components/CircleIndicator";
+import WhiteContainer from "../../components/WhiteContainer";
+import { useAuth } from "../../context/AuthContext";
 import { DiaryDaySession } from "../../lib/types";
+import { getDate, getGreeting, prettierDatetime } from "../../lib/utils";
+import { getDiaryDay } from "../../services/diary";
+import colors from "../../styles/colors";
+import BarIndicator from "../../components/BarIndicator";
 const screenWidth = Dimensions.get("window").width;
 
 export default function Home() {
@@ -20,14 +22,28 @@ export default function Home() {
   const [diaryDay, setDiaryDay] = useState<DiaryDaySession>();
   const [errorMsg, setErrorMsg] = useState<string>();
 
-  const targetCalorie = Number(profile?.tdee) ?? 0;
+  const targetCalories = diaryDay?.target.calories ?? 0;
+  const consumedCalories = diaryDay?.consumed.calories ?? 0;
+  const remainingCalories = diaryDay?.remaining.calories ?? 0;
+
+  const targetProtein = diaryDay?.target.protein_g ?? 0;
+  const consumedProtein = diaryDay?.consumed.protein_g ?? 0;
+  const remainingProtein = diaryDay?.remaining.protein_g ?? 0;
+
+  const targetCarbs = diaryDay?.target.carbs_g ?? 0;
+  const consumedCarbs = diaryDay?.consumed.carbs_g ?? 0;
+  const remainingCarbs = diaryDay?.remaining.carbs_g ?? 0;
+
+  const targetFat = diaryDay?.target.fat_g ?? 0;
+  const consumedFat = diaryDay?.consumed.fat_g ?? 0;
+  const remainingFat = diaryDay?.remaining.fat_g ?? 0;
 
   const fetchDiaryDay = async () => {
     try {
       const result = await getDiaryDay(date);
       setDiaryDay(result);
     } catch (error: any) {
-      setErrorMsg(`${error.code} ${error.message}`)
+      setErrorMsg(`${error.code} ${error.message}`);
     }
   };
 
@@ -37,12 +53,14 @@ export default function Home() {
       setPrettyDt(prettierDatetime());
       setDate(getDate());
     }, 60000);
-
-    fetchDiaryDay();
-    console.log("diaryDay", diaryDay)
-
     return () => clearInterval(secTimer);
-  }, []);
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDiaryDay();
+    }, [date]),
+  );
 
   return (
     <SafeAreaProvider>
@@ -59,11 +77,43 @@ export default function Home() {
             source={require("../../assets/logo.png")}
           />
         </View>
-        <View>
+        <View style={{alignSelf: 'center', marginTop: -15}}>
           <WhiteContainer width={"95%"}>
-            <View>
-              <CircleIndicator max={targetCalorie} value={diaryDay?.consumed.calories} />
-              <CalorieInfo />
+            <View style={styles.inRow}>
+              <View>
+                <CircleIndicator
+                  max={targetCalories}
+                  value={consumedCalories}
+                />
+                <CalorieInfo
+                  target={targetCalories}
+                  left={remainingCalories}
+                  eaten={consumedCalories}
+                  fontSize={14}
+                />
+              </View>
+              <View style={styles.line} />
+              <View style={{justifyContent: 'center'}}>
+                <Text style={styles.macroText}>MACRONUTRIENTS</Text>
+                <BarIndicator
+                  text="Protein"
+                  max={targetProtein}
+                  value={consumedProtein}
+                  colors={colors.proteinGradient}
+                />
+                <BarIndicator
+                  text="Carbs"
+                  max={targetCarbs}
+                  value={consumedCarbs}
+                  colors={colors.carbsGradient}
+                />
+                <BarIndicator
+                  text="Fats"
+                  max={targetFat}
+                  value={consumedFat}
+                  colors={colors.fatsGradient}
+                />
+              </View>
             </View>
           </WhiteContainer>
         </View>
@@ -78,58 +128,12 @@ const styles = StyleSheet.create({
     width: screenWidth,
     flex: 1,
   },
-  logo: {
-    resizeMode: "contain",
-    width: 60,
-    height: 60,
-    marginRight: 10,
-  },
-  input: {
-    alignItems: "center",
-  },
-  inputLabel: {
-    alignSelf: "flex-start",
-    fontFamily: "PlusJakartaSans-Medium",
-    marginTop: 15,
-    margin: 10,
-    fontSize: 15,
-  },
-  inputControl: {
-    fontFamily: "PlusJakartaSans-Regular",
-    alignSelf: "center",
-    width: "95%",
-    height: 52,
-    backgroundColor: colors.buttonSecondary,
-    borderColor: colors.border,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 15,
-  },
-  form: {
-    alignSelf: "center",
-    width: "95%",
-    paddingTop: 10,
-    paddingBottom: 16,
-  },
-  btnContainer: {
-    width: "100%",
-    marginTop: 20,
-  },
-  gradient: {
-    flex: 1,
-  },
   imageContainer: {
     width: screenWidth,
     marginTop: 10,
     height: 80,
     justifyContent: "space-between",
     flexDirection: "row",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
   },
   welcomeContainer: {
     flex: 1,
@@ -148,42 +152,26 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontFamily: "PlusJakartaSans-Regular",
   },
-  signupText: {
-    alignItems: "center",
+  logo: {
+    resizeMode: "contain",
+    width: 60,
+    height: 60,
+    marginRight: 10,
   },
-  signupLinkText: {
-    fontSize: 14,
-    color: colors.textMuted,
-    fontFamily: "PlusJakartaSans-Regular",
-  },
-  signupBoldText: {
-    color: colors.buttonPrimaryStart,
-    fontFamily: "PlusJakartaSans-Bold",
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: 10,
-    backgroundColor: colors.page,
-    marginTop: 0,
-    paddingTop: 0,
-  },
-  icon: {
-    position: "absolute",
-    right: 16,
-  },
-  passwordContainer: {
-    width: "100%",
-    height: 52,
+  inRow: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
   },
-  errorText: {
-    color: colors.danger,
-    alignSelf: "flex-start",
-    marginLeft: 10,
+  line: {
+    width: 1,
+    height: "80%",
+    backgroundColor: colors.page,
+    margin: 10,
+  },
+  macroText: {
+    color: colors.textSoft,
+    fontFamily: "PlusJakartaSans-SemiBold",
+    fontSize: 12,
+    marginBottom: 10,
+    letterSpacing: 0.8,
   },
 });
