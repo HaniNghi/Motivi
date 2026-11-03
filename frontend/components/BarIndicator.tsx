@@ -1,5 +1,5 @@
 import { ComponentProps } from "react";
-import { View, Text, StyleSheet} from "react-native";
+import { View, Text, StyleSheet, DimensionValue} from "react-native";
 import colors from "../styles/colors";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 interface BarIndicatorProps {
   value: number;
   max: number;
-  size?: number;
+  size?: DimensionValue;
   strokeWidth?: number;
   colors: ComponentProps<typeof LinearGradient>["colors"],
   text: string
@@ -21,7 +21,7 @@ export default function BarIndicator({
   text 
 }: BarIndicatorProps) {
   const safeValue = Math.min(value, max);
-  const progress = max > 0 ? safeValue*size / max : 0;
+  const progressPercent = max > 0 ? (safeValue / max) * 100 : 0;
 
   return (
     <View
@@ -37,12 +37,12 @@ export default function BarIndicator({
         <Text style={[styles.text, {color: colors[0]}]}>{text}</Text>
         <Text style={styles.label}>{value}/{max}g</Text>
       </View>
-      <View style={{width: size}}>
+      <View style={{ width: "100%" }}>
         {/* Background */}
-        <View style={[styles.background, { width: size }]} />
+        <View style={[styles.background, { width: "100%" }]} />
 
         {/* Progress */}
-        <View style={[styles.progress, { width: progress }]}>
+        <View style={[styles.progress, { width: `${progressPercent}%` }]}>
           <LinearGradient
               colors={colors}
               start={{ x: 0, y: 1 }}

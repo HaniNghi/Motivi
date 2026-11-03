@@ -45,6 +45,7 @@ const colors = {
   redTint2: 'rgba(246, 92, 92, 0.4)',
   redTint: 'rgba(246, 92, 92, 0.08)',
   selectedGoalTint: 'rgba(99,102,241,0.08)',
+  whiteTint: 'rgba(192, 189, 189, 0.4)',
   selectedGoalTint2: 'rgba(100, 102, 221, 0.1)',
   selectedGoalTint3: 'rgba(100, 102, 221, 0.4)',
   logoutBg: 'rgba(239,68,68,0.06)',

@@ -15,6 +15,7 @@ export default function WhiteContainer({
   width,
   titleColor,
   button = false,
+  buttonPill = true,
   buttonTitle,
   onPress,
 }: {
@@ -23,6 +24,7 @@ export default function WhiteContainer({
   width?: DimensionValue;
   titleColor?: string;
   button?: boolean;
+  buttonPill?: boolean
   buttonTitle?: string;
   onPress?: () => void;
 }) {
@@ -41,7 +43,7 @@ export default function WhiteContainer({
           )}
           {button && buttonTitle && (
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, {backgroundColor : buttonPill ? colors.surfaceMuted: '' } ]}
               onPress={onPress}
               activeOpacity={0.7}
             >
@@ -75,7 +77,6 @@ const styles = StyleSheet.create({
     height: 32,
     paddingHorizontal: 14,
     borderRadius: 999,
-    backgroundColor: "#eef2ff",
     alignItems: "center",
     justifyContent: "center",
   },
