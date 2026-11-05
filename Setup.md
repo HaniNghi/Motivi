@@ -1,6 +1,12 @@
-1-Install the required tools
+# Motivi — Installation, Setup & Docker Guide
 
-Check that your machine has the correct programs installed:
+This guide covers everything needed to install prerequisites, initialize the project structure, configure PostgreSQL and Docker, run database migrations, and set up testing for both the backend and frontend.
+
+---
+
+## 1. Prerequisites & Tool Installation
+
+First, verify whether the required tools are installed on your machine:
 
 ```bash
 python3 --version
@@ -9,11 +15,57 @@ npm --version
 docker --version
 ```
 
-If any of them is missing, install them first.
+If any of them are missing, install them below.
 
-2-Create the project folders
+### PostgreSQL Installation (macOS via Homebrew)
 
-Create the main project structure first:
+1. Open Terminal and install PostgreSQL with Homebrew:
+   ```bash
+   brew install postgresql
+   ```
+2. Start the background service so PostgreSQL runs automatically:
+   ```bash
+   brew services start postgresql
+   ```
+3. Verify that the server is active and accepting connections:
+   ```bash
+   pg_isready
+   ```
+   - Expected output if healthy: `/tmp:5432 - accepting connections`
+   - Access the interactive SQL shell as the default superuser:
+     ```bash
+     psql -U postgres
+     ```
+   - If you get the error `psql: error: connection to server on socket "/tmp/.s.PGSQL.5432" failed: FATAL: role "postgres" does not exist`, connect with:
+     ```bash
+     psql postgres
+     ```
+   - Quit the interactive shell when finished by typing `\q`.
+
+### Docker Desktop Installation (macOS)
+
+1. **Download Docker Desktop**:
+   - Visit the Docker Desktop for Mac download page.
+   - Download the appropriate version for your Mac (Intel or Apple Silicon).
+2. **Install Docker Desktop**:
+   - Open the downloaded `.dmg` file.
+   - Drag the Docker icon to your **Applications** folder.
+   - Double-click `Docker.app` in Applications to start Docker.
+3. **Complete Setup**:
+   - Accept the terms and conditions.
+   - Enter your system password when prompted (Docker needs privileged access).
+   - Wait for Docker to start (the whale icon in the menu bar will stop animating).
+4. **Verify Installation**:
+   ```bash
+   docker --version
+   docker run hello-world
+   ```
+
+---
+
+## 2. Project Folder Structure
+
+Create the main project directories:
 
 ```bash
 mkdir -p Motivi/backend
@@ -22,108 +74,77 @@ mkdir -p Motivi/proxy
 cd Motivi
 ```
 
-At this point, you should have:
-- the project root
-- a backend folder for the Flask app
-- a db folder for the PostgreSQL secret and init SQL
-- a proxy folder for Nginx
+At this point, you have:
+- the project root (`Motivi/`)
+- `backend/` — Flask API application
+- `db/` — PostgreSQL secret (`password.txt`) and optional init SQL
+- `proxy/` — Nginx configuration
 
-3-Create the Python virtual environment
+---
 
-Inside the backend folder:
+## 3. Backend Setup (Flask + SQLAlchemy)
+
+### 3.1 Create the Python Virtual Environment & Install Dependencies
 
 ```bash
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
-```
 
-Now install the dependencies:
-
-```bash
 pip install --upgrade pip
 pip install flask flask-cors flask-sqlalchemy flask-migrate "psycopg[binary]" PyJWT bcrypt httpx python-dotenv pytest
-```
-
-Save them into requirements.txt:
-
-```bash
 pip freeze > requirements.txt
 ```
 
-4-Create the Flask app structure
+### 3.2 Create the Flask App Structure
 
-Create the following structure inside backend:
+Inside `backend/`:
 
 ```bash
 mkdir -p app/routes app/models app/database
 ```
 
-Then create these files:
-- app/__init__.py
-- app/database/db.py
-- app/routes/__init__.py
-- app/routes/auth.py
-- app/main.py
-- app/models/__init__.py
-- app/models/user.py
+Core files (order matters because the app factory must exist before registering routes and models):
+- `app/__init__.py` — App factory (`create_app()`), required by CLI commands like `flask --app app:create_app db migrate`
+- `app/database/db.py` — Shared database & migration instances
+- `app/routes/__init__.py` — Blueprint registration
+- `app/routes/auth.py` — Auth routes
+- `app/main.py` — Application entry point
+- `app/models/__init__.py` — Model exports
+- `app/models/user.py` — User model
 
-This order matters because the app factory must be created before you register routes and models.
-
-5-Set up the app factory and database connection
-
-In app/__init__.py, create the app factory:
-
-
-
-The app factory is the first important setup step because Flask CLI commands like `flask --app app:create_app db migrate` need a callable app factory.
-
-6-Set up the shared database object
-
-In app/database/db.py:
+### 3.3 Shared Database Instance (`app/database/db.py`)
 
 ```python
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 ```
 
-This gives all models one shared database instance.
+### 3.4 Routes & Blueprints (`app/routes/`)
 
-7-Set up routes and blueprints
-
-In app/routes/__init__.py:
-
+In `app/routes/__init__.py`:
 ```python
 from .auth import auth
-
 
 def register_blueprints(app):
     app.register_blueprint(auth)
 ```
 
-In app/routes/auth.py, define a sample route:
-
+In `app/routes/auth.py`:
 ```python
 from flask import Blueprint
 
-
 auth = Blueprint("auth", __name__, url_prefix="/api/auth")
-
 
 @auth.route("/health")
 def health():
     return {"status": "ok"}
 ```
 
-This step comes after the app factory because the routes must be registered only after the app exists.
-
-8-Create the app entry point
-
-In app/main.py:
+### 3.5 App Entry Point (`app/main.py`)
 
 ```python
 from app import create_app
@@ -134,9 +155,13 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
 ```
 
-9-Create the Docker secret file
+---
 
-Create a password file for PostgreSQL:
+## 4. Database Secret & Docker Configuration
+
+### 4.1 Create the Docker Secret File
+
+Create the PostgreSQL password file used by Docker secrets and local backend fallback:
 
 ```bash
 mkdir -p db
@@ -144,13 +169,7 @@ printf '%s\n' 'your_secure_password' > db/password.txt
 chmod 600 db/password.txt
 ```
 
-This file is what Docker uses as a secret.
-
-10-Create Docker Compose
-
-Create a root-level compose.yaml file.
-
-Example structure:
+### 4.2 Root `compose.yaml` Structure
 
 ```yaml
 services:
@@ -220,96 +239,141 @@ networks:
   frontnet:
 ```
 
-This is the Docker setup that creates the PostgreSQL database and gives your Flask app access to the secret password.
+---
 
-11-Start Docker and test the app
+## 5. Docker Development Modes
 
-Run:
+This project supports **two development modes**:
 
+1. **Full app stack in Docker** (PostgreSQL + Flask backend + proxy)
+2. **Database only in Docker, backend runs locally** *(recommended for active backend development)*
+
+### Mode 1: Full App Stack in Docker
+
+Start all services:
 ```bash
 docker compose down -v
 docker compose up -d --build
 ```
 
-Then check if the services started:
-
+Verify running containers and logs:
 ```bash
 docker compose ps
 docker compose logs backend --tail=200
 ```
 
-Open the app in the browser:
+- App URL: `http://localhost:8000/`
+- Inside Docker, the backend connects to PostgreSQL using the Docker service name `db`:
+  ```text
+  postgresql://motivi:YOUR_PASSWORD@db:5432/calorie
+  ```
 
-```text
-http://localhost:8000/
-```
+### Mode 2: Database Only in Docker + Local Backend (Recommended)
 
-12-Create the initial database migration
-
-After the database and backend are both running, initialize Alembic:
+Run only PostgreSQL in Docker while running Flask locally in `.venv`:
 
 ```bash
-cd /Users/nghivo/Motivi/backend
+# Using the main compose file (db service only):
+docker compose up -d db
+
+# Or using a dedicated db-only compose file if configured:
+docker compose -p motivi-db-only -f compose.db-only.yaml up -d
+```
+
+- Because the backend runs on your Mac (outside Docker), connect using `localhost`:
+  ```text
+  postgresql://motivi:YOUR_PASSWORD@localhost:5432/calorie
+  # Or if mapped to host port 15432 to avoid local port 5432 conflicts:
+  postgresql://motivi:YOUR_PASSWORD@localhost:15432/calorie
+  ```
+
+### Understanding `localhost` vs `db` & Port 5432 Conflicts
+
+| Where you connect from | Host to use | Port to use |
+| :--- | :--- | :--- |
+| Inside a Docker container | `db` | `5432` |
+| Local backend on your Mac | `localhost` | Published host port (`5432` or `15432`) |
+| Database GUI (e.g., Postico) | `localhost` | Published host port (`5432` or `15432`) |
+
+> **Why port `15432`?**
+> If another PostgreSQL service is already running on your Mac on port `5432`, mapping `ports: ["15432:5432"]` in Docker avoids host port conflicts while still exposing the container's port `5432` to your machine.
+
+**Example Postico Settings:**
+- **Host**: `localhost`
+- **Port**: `5432` (or `15432` if using `compose.db-only.yaml`)
+- **User**: `motivi`
+- **Database**: `calorie`
+- **Password**: value from `db/password.txt`
+
+**Clean Database Reset:**
+If the database state is broken and you want a fresh start (removes the database volume):
+```bash
+docker compose down -v
+docker compose up -d db
+```
+*(Or with `compose.db-only.yaml`: `docker compose -p motivi-db-only -f compose.db-only.yaml down -v && docker compose -p motivi-db-only -f compose.db-only.yaml up -d`)*
+
+---
+
+## 6. Database Migrations (Alembic / Flask-Migrate)
+
+### 6.1 Initialize Alembic (One-Time)
+
+```bash
+cd backend
 source .venv/bin/activate
 flask --app app:create_app db init
 ```
 
-This creates the migrations folder and configuration files.
+### 6.2 Generate & Apply Migrations
 
-Then generate the first migration based on your models:
-
+**When running the backend locally (Mode 2):**
 ```bash
-docker compose exec backend flask --app app:create_app db migrate -m "initial schema"
+cd backend
+source .venv/bin/activate
+set -a && source ../.env && set +a
+
+flask --app app:create_app db migrate -m "describe your change"
+flask --app app:create_app db upgrade
 ```
 
-Apply it to the database:
-
-```bash
-docker compose exec backend flask --app app:create_app db upgrade
-```
-
-13-Check migration status
-
-Use these commands any time you want to confirm what revision is active:
-
-```bash
-docker compose exec backend flask --app app:create_app db current
-```
-
-View current migration history:
-
-```bash
-docker compose exec backend flask --app app:create_app db history
-```
-
-14-Add new changes later
-
-When you add a new model or modify an existing table, run:
-
+**When running the backend container in Docker (Mode 1):**
 ```bash
 docker compose exec backend flask --app app:create_app db migrate -m "describe your change"
 docker compose exec backend flask --app app:create_app db upgrade
 ```
 
-15-Important notes
+### 6.3 Check Migration Status & History
 
-- Use `db` as the hostname only from inside Docker Compose.
-- Use `localhost` if you run Flask locally outside Docker.
-- If Alembic says `No changes in schema detected`, it usually means the database already matches your model definition.
+```bash
+# Local:
+flask --app app:create_app db current
+flask --app app:create_app db history
+
+# Inside Docker:
+docker compose exec backend flask --app app:create_app db current
+docker compose exec backend flask --app app:create_app db history
+```
+
+**Migration Troubleshooting Notes:**
+- If Alembic says `No changes in schema detected`, the database already matches your SQLAlchemy model definitions.
 - If the database does not exist or the app cannot connect, the migration command will fail before creating a new revision.
 
-16-Frontend testing setup (Jest + React Native Testing Library)
+---
+
+## 7. Frontend Testing Setup (Jest + React Native Testing Library)
 
 To set up unit and component testing for the Expo React Native app:
 
-1. Install testing packages in the `frontend` folder (ensure `jest-expo` version matches your Expo SDK version, e.g. SDK 57):
+### 7.1 Install Testing Packages
 
+Ensure `jest-expo` matches your Expo SDK version:
 ```bash
 cd frontend
 npm install --save-dev jest-expo@~57.0.0 jest @testing-library/react-native @types/jest --legacy-peer-deps
 ```
 
-2. Add the test script in `frontend/package.json`:
+### 7.2 Add the `test` Script in `frontend/package.json`
 
 ```json
 "scripts": {
@@ -321,7 +385,7 @@ npm install --save-dev jest-expo@~57.0.0 jest @testing-library/react-native @typ
 }
 ```
 
-3. Update `frontend/tsconfig.json` to load Jest's global types:
+### 7.3 Update `frontend/tsconfig.json`
 
 ```json
 {
@@ -333,7 +397,7 @@ npm install --save-dev jest-expo@~57.0.0 jest @testing-library/react-native @typ
 }
 ```
 
-4. Create `frontend/jest.config.js`:
+### 7.4 Create `frontend/jest.config.js`
 
 ```js
 module.exports = {
@@ -345,7 +409,7 @@ module.exports = {
 };
 ```
 
-5. Create `frontend/jest.setup.js` for global mocks:
+### 7.5 Create `frontend/jest.setup.js`
 
 ```js
 // Mock SafeAreaContext so components wrapped in <SafeAreaProvider> render in tests
@@ -353,9 +417,11 @@ const mockSafeAreaContext = require('react-native-safe-area-context/jest/mock').
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
 ```
 
-17-Running tests
+---
 
-Run frontend tests (Jest):
+## 8. Running Tests
+
+### Frontend Tests (Jest)
 
 ```bash
 cd frontend
@@ -364,7 +430,7 @@ npm test -- --watch      # Run in interactive watch mode
 npm test -- --coverage   # Generate test coverage report
 ```
 
-Run backend tests (Pytest):
+### Backend Tests (Pytest)
 
 ```bash
 cd backend
