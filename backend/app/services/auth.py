@@ -67,7 +67,7 @@ def dump_user(user: User)-> dict:
     return {
         "id": str(user.id),
         "email": user.email,
-        "display_name": user.display_name or "",
+        "display_name": user.display_name,
     }
 def issue_access_token(user: User)-> str:
     minutes = int(os.getenv("JWT_ACCESS_MINUTES"))
@@ -91,11 +91,11 @@ def session_payload(user: User, refresh_raw: str) -> str:
         "expires_in": minutes * 60,
     }
 
-def register_user(email: str, password: str, display_name: str | None) -> tuple[User, str]:
+def register_user(email: str, password: str, display_name: str) -> tuple[User, str]:
     email = normalize_email(email)
     if User.query.filter_by(email=email).first():
         raise ValueError("email_taken")
-    name = (display_name or "").strip() or email.split("@")[0]
+    name = display_name.strip() or email.split("@")[0]
     user = User(
         email=email,
         password_hash=hash_password(password),

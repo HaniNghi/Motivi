@@ -1,0 +1,79 @@
+# Alembic & Flask-Migrate Guide
+
+Single-database configuration for Flask.
+
+---
+
+## Part 1: Initial Setup (One-Time per Project)
+
+### 1. Install `Flask-Migrate`
+Inside your virtual environment (`backend/.venv`):
+```bash
+pip install flask-migrate
+```
+
+### 2. Initialize `SQLAlchemy` and `Migrate`
+Create shared instances in `app/database/db.py`:
+```python
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
+migrate = Migrate()
+```
+
+### 3. Bind `db`, `migrate`, and Models in `create_app()`
+In `app/__init__.py`, configure the database URI, initialize `db` and `migrate`, and **import all your models** so Alembic knows they exist:
+```python
+db.init_app(app)
+migrate.init_app(app, db, directory="migrations")
+
+# IMPORTANT: Import models after init_app so Alembic can detect them
+from app import models
+```
+
+### 4. Initialize the `migrations/` folder
+From `backend/` (with `.venv` active), run once to create `migrations/`, `alembic.ini`, and `env.py`:
+```bash
+flask --app app:create_app db init
+```
+
+---
+
+## Part 2: Daily Workflow (Whenever You Change Models)
+
+### Step 1: Make sure PostgreSQL is running and env vars are loaded
+```bash
+docker compose up -d db
+cd backend
+source .venv/bin/activate
+set -a && source ../.env && set +a
+```
+
+### Step 2: Update your SQLAlchemy model
+Edit your model in `backend/app/models/` (for example, changing `User.display_name` to `nullable=False`).
+
+### Step 3: Generate a new migration script
+Alembic compares your current database schema against your SQLAlchemy models and creates a file in `backend/migrations/versions/`:
+```bash
+flask --app app:create_app db migrate -m "describe your change"
+```
+
+### Step 4: Inspect the generated migration file
+Always check the newly generated file in `backend/migrations/versions/` to make sure `upgrade()` and `downgrade()` match what you intended.
+
+### Step 5: Apply the migration to the database
+```bash
+flask --app app:create_app db upgrade
+```
+
+---
+
+## Useful Commands Reference
+
+| Goal | Command |
+| :--- | :--- |
+| Check current DB revision | `flask --app app:create_app db current` |
+| View migration history | `flask --app app:create_app db history` |
+| Apply latest migrations | `flask --app app:create_app db upgrade` |
+| Roll back 1 migration | `flask --app app:create_app db downgrade -1` |

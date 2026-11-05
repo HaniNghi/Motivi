@@ -18,7 +18,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False) #if there is google_sub then str | None and nullable=True
     # google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
-    display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utcnow
     )

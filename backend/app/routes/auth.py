@@ -33,7 +33,7 @@ def register():
         return error_response("invalid_body", first_martshmallow_message(exc), 400)
     try:
         user, refresh = register_user(
-            data["email"], data["password"], data.get("display_name")
+            data["email"], data["password"], data["display_name"]
         )
     except ValueError as exc:
         if str(exc) == "email_taken":

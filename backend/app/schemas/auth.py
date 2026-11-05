@@ -10,7 +10,11 @@ class RegisterSchema(Schema):
         validate=validate.Length(min=8, error="Password must be at least 8 characters."),
         error_messages={"required": "Email and password are required."},
     )
-    display_name = fields.String(load_default=None, allow_none=True)
+    display_name = fields.String(
+        required=True,
+        validate=validate.Length(min=1, max=120),
+        error_messages={"required": "display_name is required."},
+    )
 
 class LoginSchema(Schema):
     email = fields.Email(
