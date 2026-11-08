@@ -1,3 +1,7 @@
+import { ImageSourcePropType } from "react-native";
+
+const DEFAULT_FOOD_IMAGE = require("../assets/no-pictures.png");
+
 const GREETINGS = [
   { untilHour: 5, text: "Good night" },
   { untilHour: 12, text: "Good morning" },
@@ -53,4 +57,22 @@ export function prettyFoodName(foodName: string): string {
 
   // 2. Lowercase everything, then uppercase only the first letter
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
-} 
+}
+
+export function imageSource(
+  picLink?: string | ImageSourcePropType | null,
+  hasError = false,
+): ImageSourcePropType {
+  if (!picLink || hasError) return DEFAULT_FOOD_IMAGE;
+  if (typeof picLink === "string") {
+    const trimmed = picLink.trim();
+    if (!trimmed) return DEFAULT_FOOD_IMAGE;
+    return {
+      uri: trimmed,
+      headers: {
+        "User-Agent": process.env.OFF_USER_AGENT || "MotiviApp/1.0",
+      },
+    };
+  }
+  return picLink;
+}

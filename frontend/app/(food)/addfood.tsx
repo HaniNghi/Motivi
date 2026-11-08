@@ -24,6 +24,7 @@ export default function AddFood() {
   const [searchedFoods, setSearchedFoods] = useState<Food[]>();
   const [inputFood, setInputFood] = useState<string>();
   const [errorMsg, setErrorMsg] = useState<string>();
+  const [addFood, setAddFood] = useState<Food>();
   const [addModalVisible, setAddModalVisible] = useState(false);
 
   const foods = searchedFoods ?? [];
@@ -131,6 +132,10 @@ export default function AddFood() {
                     carbs_g={food.carbs_per_100g}
                     fat_g={food.fat_per_100g}
                     picLink={food.image_url}
+                    addButton={true}
+                    onPress={() => {setAddModalVisible(true);
+                      setAddFood(food)
+                    }}
                   />
                 ))
               )}
@@ -141,12 +146,13 @@ export default function AddFood() {
         <TouchableOpacity
           style={styles.createCustomButton}
           activeOpacity={0.8}
-          onPress={() => setAddModalVisible(true)}
+          onPress={() => router.push("/(food)/customfood")}
         >
           <Text style={styles.backButtonText}>+ Create custom food</Text>
         </TouchableOpacity>
         <AddEntry
           modalVisible={addModalVisible}
+          food={addFood}
           onClose={() => setAddModalVisible(false)}
         />
       </SafeAreaView>

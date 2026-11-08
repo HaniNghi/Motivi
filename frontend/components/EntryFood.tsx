@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import colors from "../styles/colors";
 import { LinearGradient } from "expo-linear-gradient";
-import { prettyFoodName } from "../lib/utils";
+import { imageSource, prettyFoodName } from "../lib/utils";
 
 export interface EntryFoodProps {
   picLink?: string | ImageSourcePropType | null;
@@ -59,20 +59,10 @@ export default function EntryFood({
     setImageError(false);
   }, [picLink]);
 
-  const imageSource = React.useMemo(() => {
-    if (!picLink) return require("../assets/no-pictures.png");
-    if (typeof picLink === "string") {
-      const trimmed = picLink.trim();
-      if (!trimmed) return null;
-      return {
-        uri: trimmed,
-        headers: {
-          "User-Agent": process.env.OFF_USER_AGENT || "MotiviApp/1.0",
-        },
-      };
-    }
-    return picLink;
-  }, [picLink]);
+  const resolvedImage = React.useMemo(
+    () => imageSource(picLink, imageError),
+    [picLink, imageError],
+  );
 
   const formatMacro = (val?: number | string) => {
     if (val === undefined || val === null) return "0g";
@@ -85,11 +75,7 @@ export default function EntryFood({
       <View style={styles.left}>
         <View style={styles.badge}>
           <Image
-            source={
-              imageSource && !imageError
-                ? imageSource
-                : require("../assets/no-pictures.png")
-            }
+            source={resolvedImage}
             style={styles.image}
             resizeMode="contain"
             onError={() => setImageError(true)}
