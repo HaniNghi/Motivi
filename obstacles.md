@@ -281,6 +281,19 @@ Picture link can not be displayed =>
 
   Need to update EntryFood.tsx to automatically attach the required header and clean any whitespace from the URL
 
+Passing params between Diary and addfood
+onPress={() =>
+  router.push({
+    pathname: "/(food)/addfood",
+    params: { date: getDate(currentDate) },
+  })
+}
+
+export default function AddFood() {
+  const router = useRouter();
+  const { date } = useLocalSearchParams<{ date?: string }>();
+  const selectedDate = date ?? getDate(); 
+}
 ## Food
 Add delay when user searching, prevent spaming to openfoodfact
 Change to v2 of openfoodfact

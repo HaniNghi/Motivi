@@ -1,4 +1,5 @@
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,9 +11,9 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import WhiteContainer from "../../components/WhiteContainer";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getDate, shortDatetime } from "../../lib/utils";
-import { DiaryDaySession, Entry, Food, SearchedFood } from "../../lib/types";
-import { getDiaryDay } from "../../services/diary";
-import { useFocusEffect, useRouter } from "expo-router";
+import { DiaryDaySession, Entry, EntryPayload, Food, SearchedFood } from "../../lib/types";
+import { getDiaryDay, postEntry } from "../../services/diary";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import colors from "../../styles/colors";
 import EntryFood from "../../components/EntryFood";
 import AddEntry from "../../components/AddEntry";
@@ -20,11 +21,12 @@ import { getFoods } from "../../services/food";
 
 export default function AddFood() {
   const router = useRouter();
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const { date } = useLocalSearchParams<{date: string}>();
+  const [today, setToday] = useState<Date>(new Date());
   const [searchedFoods, setSearchedFoods] = useState<Food[]>();
   const [inputFood, setInputFood] = useState<string>();
   const [errorMsg, setErrorMsg] = useState<string>();
-  const [addFood, setAddFood] = useState<Food>();
+  const [clickedFood, setClickedFood] = useState<Food>();
   const [addModalVisible, setAddModalVisible] = useState(false);
 
   const foods = searchedFoods ?? [];
@@ -59,28 +61,22 @@ export default function AddFood() {
     return () => clearTimeout(delayDebounceFn);
   }, [inputFood, fetchSearchedFoods]);
 
+  const addEntry = async (amountG: number, food: Food) => {
+    if (!amountG || !food || amountG <= 0) return;
+    if (!date) return;
 
-  const handlePrevDay = () => {
-    setCurrentDate((prev) => {
-      const nextDate = new Date(prev);
-      nextDate.setDate(nextDate.getDate() - 1);
-      return nextDate;
-    });
-  };
+    const payload: EntryPayload = {
+      food_id: food.id,
+      date: date,
+      amount_g: amountG
+    }
 
-  const handleNextDay = () => {
-    setCurrentDate((prev) => {
-      const nextDate = new Date(prev);
-      nextDate.setDate(nextDate.getDate() + 1);
-      return nextDate;
-    });
-  };
-
-  const isToday = getDate(currentDate) === getDate(new Date());
-  const formattedDate = isToday
-    ? `Today, ${currentDate.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`
-    : shortDatetime(currentDate);
-
+    try {
+      await postEntry(payload);
+    } catch (error: any) {
+      Alert.alert("Failed to add a food", error.message)
+    }
+  }
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -134,7 +130,7 @@ export default function AddFood() {
                     picLink={food.image_url}
                     addButton={true}
                     onPress={() => {setAddModalVisible(true);
-                      setAddFood(food)
+                      setClickedFood(food)
                     }}
                   />
                 ))
@@ -150,11 +146,13 @@ export default function AddFood() {
         >
           <Text style={styles.backButtonText}>+ Create custom food</Text>
         </TouchableOpacity>
+        {clickedFood &&
         <AddEntry
           modalVisible={addModalVisible}
-          food={addFood}
+          food={clickedFood}
           onClose={() => setAddModalVisible(false)}
-        />
+          onAdd={(amountG, food) => addEntry(amountG, food)}
+        />}
       </SafeAreaView>
     </SafeAreaProvider>
   );

@@ -86,7 +86,6 @@ export interface NutritionTotals {
   carbs_g: number;
   fat_g: number;
 }
-
 export interface Entry {
   id: string;
   food_id: string;
@@ -104,6 +103,7 @@ export interface DiaryDaySession {
   consumed: NutritionTotals;
   remaining: NutritionTotals;
   entries: Entry[];
+  entry?: Entry
 }
 
 export interface Food {
@@ -124,4 +124,10 @@ export interface SearchedFood {
     fetched_from_open_food_facts: boolean,
     foods: Food[],
     query: string,
+}
+
+export interface EntryPayload {
+  food_id: string,
+  date: string,
+  amount_g: number,
 }

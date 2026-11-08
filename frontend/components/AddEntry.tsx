@@ -14,9 +14,9 @@ import PrimaryButton from "./PrimaryButton";
 
 interface AddEntryProps {
   modalVisible: boolean;
-  food?: Food;
+  food: Food;
   onClose: () => void;
-  onAdd?: (amountG: number) => void;
+  onAdd?: (amountG: number, food: Food) => void;
 }
 
 export default function AddEntry({
@@ -56,7 +56,7 @@ export default function AddEntry({
 
   const handleAdd = () => {
     if (onAdd) {
-      onAdd(numericServing);
+      onAdd(numericServing, food);
     }
     onClose();
   };

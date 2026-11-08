@@ -158,7 +158,7 @@ export default function Diary() {
               { alignSelf: "center", width: "100%", marginTop: "auto" },
             ]}
             activeOpacity={0.8}
-            onPress={()=> router.push("/(food)/addfood")}
+            onPress={()=> router.push({ pathname:"/(food)/addfood", params: {date: getDate(currentDate)}})}
           >
             <LinearGradient
               colors={colors.primaryGradient}
