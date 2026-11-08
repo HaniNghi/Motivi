@@ -58,9 +58,25 @@ docker compose -f compose.prod.yaml run --rm backend flask --app app.main:app db
 docker compose -f compose.prod.yaml up -d
 ```
 
-The migration command runs before the backend and proxy are brought up, and
-Compose starts the database dependency for it. To populate the food catalog
-after migrations, run:
+What each command does:
+
+- `config --quiet` validates the Compose configuration and required `.env`
+  values without starting containers.
+- `build` builds the backend and proxy images; it does not start them.
+- `run --rm backend ... db upgrade` runs database migrations in a temporary
+  backend container. Compose starts the database dependency for this command;
+  `--rm` removes the temporary container when the migration finishes.
+- `up -d` starts the services in the background. It creates or reuses the
+  database volume and starts the database, backend, and proxy in dependency
+  order.
+
+For a first deployment, build the images, apply migrations, then start the
+stack. On later starts when neither the application image nor database schema
+has changed, `up -d` is usually enough. If you want Compose to rebuild changed
+images while starting services, use `up -d --build`; this still does not apply
+database migrations.
+
+After migrations complete, populate the food catalog if needed with:
 
 ```bash
 docker compose -f compose.prod.yaml run --rm backend flask --app app.main:app seed-foods
