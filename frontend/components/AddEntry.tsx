@@ -114,7 +114,6 @@ export default function AddEntry({
             <Text style={styles.caloriesUnit}> kcal</Text>
           </View>
 
-          {/* Nutrients Card */}
           <View style={styles.nutrientsBox}>
             <Text style={styles.nutrientsTitle}>NUTRIENTS</Text>
             <View style={styles.nutrientsRow}>

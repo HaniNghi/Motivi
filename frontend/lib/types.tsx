@@ -108,14 +108,14 @@ export interface DiaryDaySession {
 
 export interface Food {
   id: string;
-  brand: string;
+  brand: string | null;
   calories_per_100g: number;
   calories_per_100ml: number | null;
   carbs_per_100g: number;
   fat_per_100g: number;
-  image_url: string;
+  image_url: string | null;
   name: string;
-  off_code: string;
+  off_code: string | null;
   protein_per_100g: number;
   source: Source;
 }
@@ -130,4 +130,12 @@ export interface EntryPayload {
   food_id: string,
   date: string,
   amount_g: number,
+}
+
+export interface CustomPayload {
+  name: string,
+  calories_per_100g: number,
+  protein_per_100g: number,
+  carbs_per_100g: number,
+  fat_per_100g: number,
 }

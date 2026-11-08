@@ -7,14 +7,16 @@ interface PrimaryButtonProps {
   text: string,
   onPress: () => void,
   primary: boolean,
-  width?: DimensionValue
+  width?: DimensionValue,
+  height?: DimensionValue,
+  textSize?: number
 }
 
-export default function PrimaryButton({text, onPress, primary, width = 100} : PrimaryButtonProps) {
+export default function PrimaryButton({text, onPress, primary, width = 100, height = 36, textSize = 12} : PrimaryButtonProps) {
   return (
     <View style={[styles.btnContainer, {width: width}]}>
           <TouchableOpacity
-            style={styles.primaryButton}
+            style={[styles.primaryButton, {height: height}]}
             activeOpacity={0.8}
             onPress={onPress}
           >
@@ -25,7 +27,7 @@ export default function PrimaryButton({text, onPress, primary, width = 100} : Pr
               end={{ x: 1, y: 0 }}
               style={StyleSheet.absoluteFill}
             />}
-            <Text style={[styles.primaryButtonText, primary && {color: colors.textWhite}]}>{text}</Text>
+            <Text style={[styles.primaryButtonText, primary && {color: colors.textWhite}, {fontSize: textSize}]}>{text}</Text>
           </TouchableOpacity>
           
         </View>
@@ -37,7 +39,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   primaryButton: {
-    height: 36,
     paddingHorizontal: 24,
     borderRadius: 8,
     backgroundColor: colors.textWhite,
@@ -50,6 +51,5 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: colors.textMuted,
     fontFamily: 'PlusJakartaSans-Bold',
-    fontSize: 12,
   }
 })
