@@ -132,7 +132,7 @@ export default function Diary() {
           </WhiteContainer>
           <Text>Today's foods</Text>
 
-          <WhiteContainer>
+          <WhiteContainer style={styles.listCard}>
             <ScrollView style={styles.scrollView}>
               {entries.length === 0 ? (
                 <Text style={styles.infoText}>No food recorded</Text>
@@ -214,8 +214,10 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   scrollView: {
-    maxHeight: 0.43 * screenHeight,
     marginTop: -10,
     paddingRight: 5,
+  },
+  listCard: {
+    flex: 1,
   },
 });
