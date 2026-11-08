@@ -281,6 +281,10 @@ Picture link can not be displayed =>
 
   Need to update EntryFood.tsx to automatically attach the required header and clean any whitespace from the URL
 
+## Food
+Add delay when user searching, prevent spaming to openfoodfact
+Change to v2 of openfoodfact
+
   
 
   

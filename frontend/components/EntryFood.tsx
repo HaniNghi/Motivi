@@ -84,14 +84,16 @@ export default function EntryFood({
     <View style={[styles.container, { width }]}>
       <View style={styles.left}>
         <View style={styles.badge}>
-          {imageSource && !imageError ? (
-            <Image
-              source={imageSource}
-              style={styles.image}
-              resizeMode="contain"
-              onError={() => setImageError(true)}
-            />
-          ) : null}
+          <Image
+            source={
+              imageSource && !imageError
+                ? imageSource
+                : require("../assets/no-pictures.png")
+            }
+            style={styles.image}
+            resizeMode="contain"
+            onError={() => setImageError(true)}
+          />
         </View>
 
         <View style={styles.textContainer}>

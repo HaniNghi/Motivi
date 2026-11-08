@@ -5,7 +5,7 @@ class OffUnavailable(Exception):
 
 def off_search_params(query: str, page_size: int=20) -> dict:
     return{
-        "search_terms": query,
+        "categories_tags_en": query,
         "search_simple": 1,
         "action": "process",
         "json": 1,
@@ -97,7 +97,7 @@ def map_off_products(item: dict) -> dict | None:
 
 
 def search_open_food_facts(query: str, page_size: int = 20) -> list[dict]:
-    url = "https://world.openfoodfacts.org/cgi/search.pl"
+    url = "https://world.openfoodfacts.org/api/v2/search"
     params = off_search_params(query, page_size)
     headers = {"User-Agent": os.getenv("OFF_USER_AGENT") or "MotiviApp/1.0"}
     try:

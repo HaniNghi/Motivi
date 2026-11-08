@@ -44,15 +44,19 @@ export default function AddFood() {
   );
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      console.log(inputFood)
-      if (!inputFood) return;
-      if (inputFood.length < 3) return;
-      fetchSearchedFoods(inputFood, 50);
-    }, 3000)
+    const trimmed = (inputFood ?? "").trim();
+    if (!trimmed) {
+      fetchSearchedFoods("", 20);
+      return;
+    }
+    if (trimmed.length < 3) return;
 
-    return () => clearTimeout(delayDebounceFn)
-  }, [inputFood])
+    const delayDebounceFn = setTimeout(() => {
+      fetchSearchedFoods(trimmed, 50);
+    }, 600);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [inputFood, fetchSearchedFoods]);
 
 
   const handlePrevDay = () => {
