@@ -272,6 +272,14 @@ flask db upgrade
 flask run --port=5000
 
   
+## Diary
+Have to format the food name before display
+Picture link can not be displayed => 
+  In backend/app/services/diary.py, the dump_entry serializer was returning calories and macros, but omitted image_url. Because of this, GET /api/diary was returning entry.image_url as undefined, so EntryFood was receiving nothing.
+
+  OpenFoodFacts' image CDN (images.openfoodfacts.org) often blocks or rate-limits image requests that lack a descriptive User-Agent header (which happens on mobile native image loaders).
+
+  Need to update EntryFood.tsx to automatically attach the required header and clean any whitespace from the URL
 
   
 

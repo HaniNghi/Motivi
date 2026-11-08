@@ -140,3 +140,6 @@ This project is currently structured as a local development app and does not yet
 ## Status
 
 Motivi is actively being developed as a nutrition-tracking MVP with a backend API, mobile app front end, and supporting database tooling.
+
+## Images
+https://www.flaticon.com/

@@ -9,58 +9,70 @@ import {
   DimensionValue,
 } from "react-native";
 import colors from "../styles/colors";
+import { LinearGradient } from "expo-linear-gradient";
+import { prettyFoodName } from "../lib/utils";
 
 export interface EntryFoodProps {
-  picLink?: string | ImageSourcePropType;
-  foodName?: string;
-  title?: string;
-  name?: string;
-  amount?: string | number;
-  subtitle?: string;
-  sub?: string;
+  picLink?: string | ImageSourcePropType | null;
+  foodName: string;
+  amount: string | number;
   protein?: string | number;
   protein_g?: string | number;
   carbs?: string | number;
   carbs_g?: string | number;
-  fats?: string | number;
   fat?: string | number;
   fat_g?: string | number;
   calories?: string | number;
   width?: DimensionValue;
+  addButton?: boolean;
   onPress?: () => void;
 }
 
 export default function EntryFood({
   picLink,
   foodName,
-  title,
-  name,
-  amount,
-  subtitle,
-  sub,
+  amount = 100,
   protein,
   protein_g,
   carbs,
   carbs_g,
-  fats,
   fat,
   fat_g,
-  calories = 0,
+  calories,
+  addButton = false,
   width = "100%",
   onPress,
 }: EntryFoodProps) {
-  const displayName = foodName || title || name || "";
-  const displayAmount = amount ?? subtitle ?? sub ?? "";
+  const displayName = foodName ? prettyFoodName(foodName): "";
+  const displayAmount = amount ?? "";
   const displayProtein = protein ?? protein_g;
   const displayCarbs = carbs ?? carbs_g;
-  const displayFat = fats ?? fat ?? fat_g;
+  const displayFat = fat ?? fat_g;
   const hasMacros =
     displayProtein !== undefined ||
     displayCarbs !== undefined ||
     displayFat !== undefined;
 
-  const imageSource =
-    typeof picLink === "string" ? { uri: picLink } : picLink;
+  const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [picLink]);
+
+  const imageSource = React.useMemo(() => {
+    if (!picLink) return require("../assets/no-pictures.png");
+    if (typeof picLink === "string") {
+      const trimmed = picLink.trim();
+      if (!trimmed) return null;
+      return {
+        uri: trimmed,
+        headers: {
+          "User-Agent": process.env.OFF_USER_AGENT || "MotiviApp/1.0",
+        },
+      };
+    }
+    return picLink;
+  }, [picLink]);
 
   const formatMacro = (val?: number | string) => {
     if (val === undefined || val === null) return "0g";
@@ -68,21 +80,20 @@ export default function EntryFood({
     return val.endsWith("g") ? val : `${val}g`;
   };
 
-  const content = (
+  return (
     <View style={[styles.container, { width }]}>
-      {/* Left: Picture */}
       <View style={styles.left}>
         <View style={styles.badge}>
-          {imageSource ? (
+          {imageSource && !imageError ? (
             <Image
               source={imageSource}
               style={styles.image}
               resizeMode="contain"
+              onError={() => setImageError(true)}
             />
           ) : null}
         </View>
 
-        {/* Food name & Amount */}
         <View style={styles.textContainer}>
           <Text style={styles.foodName} numberOfLines={1}>
             {displayName}
@@ -115,23 +126,27 @@ export default function EntryFood({
         </View>
       </View>
 
-      {/* Right: Calories */}
       <View style={styles.caloriesContainer}>
         <Text style={styles.calories}>{calories}</Text>
         <Text style={styles.unit}>kcal</Text>
       </View>
+      {onPress && addButton && (
+        <TouchableOpacity
+          style={styles.addButton}
+          activeOpacity={0.8}
+          onPress={onPress}
+        >
+          <LinearGradient
+            colors={colors.primaryGradient}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 1, y: 0 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Text style={styles.addButtonText}>+</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
-
-  if (onPress) {
-    return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-        {content}
-      </TouchableOpacity>
-    );
-  }
-
-  return content;
 }
 
 const styles = StyleSheet.create({
@@ -154,10 +169,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F0FF",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   image: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
   },
   textContainer: {
     marginLeft: 12,
@@ -166,12 +182,12 @@ const styles = StyleSheet.create({
   },
   foodName: {
     color: colors.text,
-    fontSize: 15,
+    fontSize: 12,
     fontFamily: "PlusJakartaSans-Bold",
   },
   amount: {
     color: colors.textSoft,
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: "PlusJakartaSans-Regular",
     marginTop: 2,
   },
@@ -183,7 +199,7 @@ const styles = StyleSheet.create({
   },
   macroText: {
     color: colors.textSoft,
-    fontSize: 11,
+    fontSize: 9,
     fontFamily: "PlusJakartaSans-Regular",
   },
   macroProtein: {
@@ -205,12 +221,23 @@ const styles = StyleSheet.create({
   },
   calories: {
     color: colors.primary,
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "PlusJakartaSans-Bold",
   },
   unit: {
     color: colors.textSoft,
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: "PlusJakartaSans-Regular",
   },
+  addButton: {
+    height: 20,
+    width: 20,
+    borderRadius: 5,
+    marginLeft: 5,
+    overflow: 'hidden'
+  },
+  addButtonText: {
+    color: colors.textWhite,
+    alignSelf: 'center'
+  }
 });

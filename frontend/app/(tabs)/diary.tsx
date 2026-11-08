@@ -11,26 +11,32 @@ import WhiteContainer from "../../components/WhiteContainer";
 import { useCallback, useEffect, useState } from "react";
 import { getDate, shortDatetime } from "../../lib/utils";
 import CalorieInfo from "../../components/CalorieInfo";
-import { DiaryDaySession } from "../../lib/types";
+import { DiaryDaySession, Entry } from "../../lib/types";
 import { getDiaryDay } from "../../services/diary";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import BarIndicator from "../../components/BarIndicator";
 import colors from "../../styles/colors";
 import keys from "../../styles/keys";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import EntryFood from "../../components/EntryFood";
+import AddEntry from "../../components/AddEntry";
 
 const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 
 export default function Diary() {
+  const router = useRouter();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [diaryDay, setDiaryDay] = useState<DiaryDaySession>();
   const [errorMsg, setErrorMsg] = useState<string>();
+  const [addModalVisible, setAddModalVisible] = useState(false);
+
 
   const targetCalories = diaryDay?.target.calories ?? 0;
   const consumedCalories = diaryDay?.consumed.calories ?? 0;
   const remainingCalories = diaryDay?.remaining.calories ?? 0;
+  const entries: Entry[] = diaryDay?.entries ?? [];
 
   const fetchDiaryDay = useCallback(async (dateStr: string) => {
     try {
@@ -127,14 +133,32 @@ export default function Diary() {
           <Text>Today's foods</Text>
 
           <WhiteContainer>
-            <ScrollView>
-              <EntryFood foodName="Oat" amount={100} calories={400} protein_g={90} carbs_g={70} fat_g={9}/>
+            <ScrollView style={styles.scrollView}>
+              {entries.length === 0 ? (
+                <Text style={styles.infoText}>No food recorded</Text>
+              ) : (
+                entries.map((entry) => (
+                  <EntryFood
+                    key={entry.id}
+                    foodName={entry.food_name}
+                    amount={entry.amount_g}
+                    calories={entry.calories}
+                    protein_g={entry.protein_g}
+                    carbs_g={entry.carbs_g}
+                    fat_g={entry.fat_g}
+                    picLink={entry.image_url}
+                  />
+                ))
+              )}
             </ScrollView>
           </WhiteContainer>
-
           <TouchableOpacity
-            style={[keys.primaryButton, { alignSelf: "center", width: "100%" }]}
+            style={[
+              keys.primaryButton,
+              { alignSelf: "center", width: "100%", marginTop: "auto" },
+            ]}
             activeOpacity={0.8}
+            onPress={()=> router.push("/(food)/addfood")}
           >
             <LinearGradient
               colors={colors.primaryGradient}
@@ -163,6 +187,8 @@ const styles = StyleSheet.create({
   },
   indicatorContainer: {
     width: "90%",
+    flex: 1,
+    paddingBottom: 65,
   },
   dateSelector: {
     flexDirection: "row",
@@ -181,5 +207,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "PlusJakartaSans-Bold",
     color: colors.text,
+  },
+  infoText: {
+    fontSize: 10,
+    fontFamily: "PlusJakartaSans-Regular",
+    color: colors.textMuted,
+  },
+  scrollView: {
+    maxHeight: 0.43 * screenHeight,
+    marginTop: -10,
+    paddingRight: 5,
   },
 });

@@ -43,3 +43,14 @@ export function getGreeting(date = new Date()): string {
 export function addComma(number: number): string {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export function prettyFoodName(foodName: string): string {
+  if (!foodName) return "";
+
+  // 1. Remove all numbers and extra spaces
+  const cleaned = foodName.replace(/\d+/g, "").replace(/\s+/g, " ").trim();
+  if (!cleaned) return "";
+
+  // 2. Lowercase everything, then uppercase only the first letter
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+} 
