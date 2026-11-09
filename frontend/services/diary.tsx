@@ -8,8 +8,8 @@ export async function getDiaryDay(date: string ): Promise<DiaryDaySession>{
             const err = await handleError(response);
             throw err;
         }
-        const newMe: DiaryDaySession = await response.json();
-        return newMe;
+        const diary: DiaryDaySession = await response.json();
+        return diary;
     } catch (error: any) {
         throw error;
     }
@@ -22,8 +22,8 @@ export async function postEntry(payload: EntryPayload): Promise<DiaryDaySession>
             const err = await handleError(response);
             throw err;
         }
-        const newMe: DiaryDaySession = await response.json();
-        return newMe;
+        const newEntry: DiaryDaySession = await response.json();
+        return newEntry;
     } catch (error: any) {
         throw error;
     }

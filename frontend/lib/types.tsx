@@ -103,7 +103,7 @@ export interface DiaryDaySession {
   consumed: NutritionTotals;
   remaining: NutritionTotals;
   entries: Entry[];
-  entry?: Entry
+  entry?: Entry;
 }
 
 export interface Food {
@@ -121,21 +121,36 @@ export interface Food {
 }
 
 export interface SearchedFood {
-    fetched_from_open_food_facts: boolean,
-    foods: Food[],
-    query: string,
+  fetched_from_open_food_facts: boolean;
+  foods: Food[];
+  query: string;
 }
 
 export interface EntryPayload {
-  food_id: string,
-  date: string,
-  amount_g: number,
+  food_id: string;
+  date: string;
+  amount_g: number;
 }
 
 export interface CustomPayload {
-  name: string,
-  calories_per_100g: number,
-  protein_per_100g: number,
-  carbs_per_100g: number,
-  fat_per_100g: number,
+  name: string;
+  calories_per_100g: number;
+  protein_per_100g: number;
+  carbs_per_100g: number;
+  fat_per_100g: number;
+}
+
+export interface DaySummary {
+  calories: number;
+  carbs_g: number;
+  date: string;
+  fat_g: number;
+  protein_g: number;
+}
+
+export interface WeekAnalytics {
+  days: DaySummary[];
+  target_calories: number;
+  week_end: string;
+  week_start: string;
 }
