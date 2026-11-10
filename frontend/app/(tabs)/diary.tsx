@@ -30,7 +30,6 @@ export default function Diary() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [diaryDay, setDiaryDay] = useState<DiaryDaySession>();
   const [errorMsg, setErrorMsg] = useState<string>();
-  const [addModalVisible, setAddModalVisible] = useState(false);
 
 
   const targetCalories = diaryDay?.target.calories ?? 0;

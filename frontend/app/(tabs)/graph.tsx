@@ -25,6 +25,7 @@ import EntryFood from "../../components/EntryFood";
 import AddEntry from "../../components/AddEntry";
 import { getWeek } from "../../services/analytics";
 import ImageCard from "../../components/ImageCard";
+import Chart from "../../components/Chart";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -39,19 +40,18 @@ export default function Graph() {
   const [weekAverage, setWeekAverage] = useState<number>();
   const [daysOnTarget, setDaysOnTarget] = useState<number>();
 
-
-
   const handleAverage = (week: WeekAnalytics) => {
-    const days : number[] = week?.days ? week.days.map((d)=> d.calories) : [];
-    const weekAverage = days.length ? Math.round(days.reduce((sum, d) => sum + d, 0)/7) : 0 ;
-    const daysOnTarget = days.filter(d => d > week.target_calories).length;
+    const days: number[] = week?.days ? week.days.map((d) => d.calories) : [];
+    const weekAverage = days.length
+      ? Math.round(days.reduce((sum, d) => sum + d, 0) / 7)
+      : 0;
+    const daysOnTarget = days.filter((d) => d > week.target_calories).length;
 
     setWeekAverage(weekAverage);
     setDaysOnTarget(daysOnTarget);
+  };
 
-  }
-
-  const fetchWeek = async (dateStr: string) => {
+  const fetchWeek = useCallback(async (dateStr: string) => {
     try {
       const result = await getWeek(dateStr);
       setWeekAnalytics(result);
@@ -61,11 +61,13 @@ export default function Graph() {
     } catch (error: any) {
       setErrorMsg(`${error.code} ${error.message}`);
     }
-  };
+  }, []);
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
       fetchWeek(getDate(currentDate));
-    }, [currentDate]);
+    }, [currentDate, fetchWeek]),
+  );
 
   const handlePrevWeek = () => {
     setCurrentDate((prev) => {
@@ -121,6 +123,13 @@ export default function Graph() {
         </View>
         <Text style={styles.date}>{formattedDate}</Text>
         {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
+
+        {weekAnalytics && 
+        <WhiteContainer width={'95%'}>
+        <Chart rawData={weekAnalytics} width={screenWidth*0.8}/>
+        </WhiteContainer>
+        }
+{/* {weekAnalytics &&<Text>{weekAnalytics.days.map(d=> d.calories + " ")}</Text>} */}
         <View style={styles.header}>
           <WhiteContainer width={"48%"}>
             <Image
@@ -141,12 +150,12 @@ export default function Graph() {
             <Text style={styles.subText}>Days on target</Text>
           </WhiteContainer>
         </View>
-          <ImageCard
-            picLink={require("../../assets/login-banner.png")}
-            width={"90%"}
-            title="Calories only"
-            sub="No macro tracking"
-          />
+        <ImageCard
+          picLink={require("../../assets/login-banner.png")}
+          width={"90%"}
+          title="Calories only"
+          sub="No macro tracking"
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   );

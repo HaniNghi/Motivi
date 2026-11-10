@@ -1,18 +1,20 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CalorieInfo from "../../components/CalorieInfo";
 import CircleIndicator from "../../components/CircleIndicator";
 import WhiteContainer from "../../components/WhiteContainer";
 import { useAuth } from "../../context/AuthContext";
-import { DiaryDaySession } from "../../lib/types";
+import { DiaryDaySession, WeekAnalytics } from "../../lib/types";
 import { getDate, getGreeting, prettierDatetime } from "../../lib/utils";
 import { getDiaryDay } from "../../services/diary";
 import colors from "../../styles/colors";
 import BarIndicator from "../../components/BarIndicator";
 import SquareCard from "../../components/SquareCard";
 import ImageCard from "../../components/ImageCard";
+import Chart from "../../components/Chart";
+import { getWeek } from "../../services/analytics";
 const screenWidth = Dimensions.get("window").width;
 
 export default function Home() {
@@ -24,6 +26,7 @@ export default function Home() {
   const [greeting, setGreeting] = useState(getGreeting());
   const [diaryDay, setDiaryDay] = useState<DiaryDaySession>();
   const [errorMsg, setErrorMsg] = useState<string>();
+  const [weekAnalytics, setWeekAnalytics] = useState<WeekAnalytics>();
 
   const targetCalories = diaryDay?.target.calories ?? 0;
   const consumedCalories = diaryDay?.consumed.calories ?? 0;
@@ -49,6 +52,22 @@ export default function Home() {
       setErrorMsg(`${error.code} ${error.message}`);
     }
   };
+
+  const fetchWeek = useCallback(async (dateStr: string) => {
+    try {
+      const result = await getWeek(dateStr);
+      setWeekAnalytics(result);
+      setErrorMsg("");
+    } catch (error: any) {
+      setErrorMsg(`${error.code} ${error.message}`);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchWeek(getDate(new Date(date)));
+    }, [date, fetchWeek]),
+  );
 
   useEffect(() => {
     let secTimer = setInterval(() => {
@@ -80,7 +99,7 @@ export default function Home() {
             source={require("../../assets/logo.png")}
           />
         </View>
-        <View style={{ alignSelf: "center", marginTop: -15 }}>
+        <ScrollView style={{ alignSelf: "center", marginTop: -15 }}>
           <WhiteContainer width={"95%"}>
             <View style={styles.inRow}>
               <View>
@@ -157,7 +176,9 @@ export default function Home() {
               buttonTitle="See all ➜"
               buttonPill={false}
               onPress={() => router.push("/graph")}
-            />
+            >
+              {weekAnalytics && <Chart width={screenWidth*0.8} rawData={weekAnalytics} small={true} />}
+            </WhiteContainer>
           </View>
           <View>
             <ImageCard
@@ -171,7 +192,7 @@ export default function Home() {
               onPress={() => router.push("/(onboarding)/calculator")}
             />
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );
