@@ -125,7 +125,7 @@ export default function Graph() {
         {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
 
         {weekAnalytics && 
-        <WhiteContainer width={'95%'}>
+        <WhiteContainer width={'90%'}>
         <Chart rawData={weekAnalytics} width={screenWidth*0.8}/>
         </WhiteContainer>
         }
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 12,
     fontFamily: "PlusJakartaSans-Bold",
-    margin: 20,
+    marginTop: 20,
   },
   image: {
     height: 20,

@@ -99,8 +99,8 @@ export default function Home() {
             source={require("../../assets/logo.png")}
           />
         </View>
-        <ScrollView style={{ alignSelf: "center", marginTop: -15 }}>
-          <WhiteContainer width={"95%"}>
+        <ScrollView style={{ flex: 1, paddingLeft: '4%', paddingRight: '4%' }}>
+          <WhiteContainer width={"100%"}>
             <View style={styles.inRow}>
               <View>
                 <CircleIndicator
