@@ -1,5 +1,5 @@
 from decimal import Decimal
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 
 from app.database import db
 from app.models.food import Food
@@ -62,9 +62,15 @@ def search_foods(user: User, query: str, limit: int) -> tuple[list[Food], bool]:
             .all()
         )
         return foods, False
-    pattern = f"%{q}%"
+    words = q.split()
+    word_filters = and_(
+        *[
+            or_(Food.name.ilike(f"%{w}%"), Food.brand.ilike(f"%{w}%"))
+            for w in words
+        ]
+    )
     local = (
-        base.filter(or_(Food.name.ilike(pattern), Food.brand.ilike(pattern)))
+        base.filter(word_filters)
         .order_by(Food.name.asc())
         .limit(limit)
         .all()
@@ -72,10 +78,12 @@ def search_foods(user: User, query: str, limit: int) -> tuple[list[Food], bool]:
     if len(local) >= 5:
         return local, False
     fetched = False
+    fetched_codes: list[str] = []
     try:
         products = search_open_food_facts(q, page_size=limit)
         for product in products:
             upsert_off_product(product)
+            fetched_codes.append(product["off_code"])
         db.session.commit()
         fetched = True
     except OffUnavailable:
@@ -83,9 +91,14 @@ def search_foods(user: User, query: str, limit: int) -> tuple[list[Food], bool]:
             return local, False
         raise
 
+    final_filter = (
+        or_(word_filters, Food.off_code.in_(fetched_codes))
+        if fetched_codes
+        else word_filters
+    )
     foods = (
         visible_foods_query(user)
-        .filter(or_(Food.name.ilike(pattern), Food.brand.ilike(pattern)))
+        .filter(final_filter)
         .order_by(Food.name.asc())
         .limit(limit)
         .all()
