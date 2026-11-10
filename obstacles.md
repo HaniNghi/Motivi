@@ -296,7 +296,15 @@ export default function AddFood() {
 }
 ## Food
 Add delay when user searching, prevent spaming to openfoodfact
-Change to v2 of openfoodfact
+Change to v2 of openfoodfact but then change back to cgi/search because v2 cannot search brands-> cgi/search supports it better
+
+search for "Korean noodle", call off -> write in db -> second time search for "Korean noodle" -> only 4 results -> because the filtering foods in db too strict, it ignored every for example 
+"Korean Spicy Noodle" ❌ rejected (because "Spicy" is in the middle)
+  
+"Korean Chicken Noodle" ❌ rejected (because "Chicken" is in the middle)
+  
+"Korean Noodle Soup" ✅ kept!
+
 
   
 

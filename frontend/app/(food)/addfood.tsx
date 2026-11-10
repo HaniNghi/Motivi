@@ -154,6 +154,7 @@ export default function AddFood() {
             )}
           </WhiteContainer>
         </View>
+        <Text style={styles.sourceText}>Data from OpenFoodFacts</Text>
 
         <TouchableOpacity
           style={styles.createCustomButton}
@@ -237,6 +238,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "PlusJakartaSans-Regular",
     color: colors.textMuted,
+  },
+  sourceText: {
+    fontSize: 12,
+    fontFamily: "PlusJakartaSans-Regular",
+    color: colors.textMuted,
+    alignSelf: 'flex-end',
+    marginRight: 20
   },
   scrollView: {
     flex: 1,
