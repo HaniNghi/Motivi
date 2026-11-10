@@ -146,7 +146,7 @@ export default function Home() {
               colors={colors.primaryGradient}
               picLink={require("../../assets/fire.png")}
               onPress={() => {
-                router.push("/diary");
+                router.push({pathname: "/(food)/addfood", params: {date: date}});
               }}
             />
             <SquareCard

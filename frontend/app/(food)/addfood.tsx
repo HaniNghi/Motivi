@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -28,6 +29,7 @@ export default function AddFood() {
   const [errorMsg, setErrorMsg] = useState<string>();
   const [clickedFood, setClickedFood] = useState<Food>();
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const foods = searchedFoods ?? [];
 
@@ -36,11 +38,14 @@ export default function AddFood() {
       if (!limit) {
         limit = 20;
       }
+      setIsLoading(true);
       try {
         const result = await getFoods(input, limit);
         setSearchedFoods(result.foods);
       } catch (error: any) {
         setErrorMsg(`${error.code} ${error.message}`);
+      } finally {
+        setIsLoading(false);
       }
     },
     [],
@@ -52,8 +57,12 @@ export default function AddFood() {
       fetchSearchedFoods("", 20);
       return;
     }
-    if (trimmed.length < 3) return;
+    if (trimmed.length < 3) {
+      setIsLoading(false);
+      return;
+    }
 
+    setIsLoading(true);
     const delayDebounceFn = setTimeout(() => {
       fetchSearchedFoods(trimmed, 50);
     }, 600);
@@ -110,32 +119,39 @@ export default function AddFood() {
 
         <View style={styles.indicatorContainer}>
           <WhiteContainer style={styles.listCard}>
-            <ScrollView
-              style={styles.scrollView}
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-            >
-              {foods.length === 0 ? (
-                <Text style={styles.infoText}>No food</Text>
-              ) : (
-                foods.map((food) => (
-                  <EntryFood
-                    key={food.id}
-                    foodName={food.name}
-                    amount={100}
-                    calories={food.calories_per_100g}
-                    protein_g={food.protein_per_100g}
-                    carbs_g={food.carbs_per_100g}
-                    fat_g={food.fat_per_100g}
-                    picLink={food.image_url}
-                    addButton={true}
-                    onPress={() => {setAddModalVisible(true);
-                      setClickedFood(food)
-                    }}
-                  />
-                ))
-              )}
-            </ScrollView>
+            {isLoading ? (
+              <View style={styles.loaderContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+              </View>
+            ) : (
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+              >
+                {foods.length === 0 ? (
+                  <Text style={styles.infoText}>No food</Text>
+                ) : (
+                  foods.map((food) => (
+                    <EntryFood
+                      key={food.id}
+                      foodName={food.name}
+                      amount={100}
+                      calories={food.calories_per_100g}
+                      protein_g={food.protein_per_100g}
+                      carbs_g={food.carbs_per_100g}
+                      fat_g={food.fat_per_100g}
+                      picLink={food.image_url}
+                      addButton={true}
+                      onPress={() => {
+                        setAddModalVisible(true);
+                        setClickedFood(food);
+                      }}
+                    />
+                  ))
+                )}
+              </ScrollView>
+            )}
           </WhiteContainer>
         </View>
 
@@ -193,6 +209,11 @@ const styles = StyleSheet.create({
   },
   listCard: {
     flex: 1,
+  },
+  loaderContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   dateSelector: {
     flexDirection: "row",
