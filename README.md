@@ -4,6 +4,17 @@ Motivi is a calorie and nutrition tracking application built to help people moni
 
 The project combines a Python Flask API with a React Native mobile client and a PostgreSQL database, with Docker support for local development.
 
+<img width="120" height="262" alt="Simulator Screenshot - iPhone 17 - 2026-11-11 at 09 47 41" src="https://github.com/user-attachments/assets/ec7162f1-e30f-4649-be95-b4d0413684b2" />
+<img width="120" height="262" alt="Simulator Screenshot - iPhone 17 - 2026-11-11 at 09 51 02" src="https://github.com/user-attachments/assets/da0a761e-c56d-4eac-837a-b10278b342a9" />
+<img width="120" height="262" alt="Simulator Screenshot - iPhone 17 - 2026-11-11 at 09 53 40" src="https://github.com/user-attachments/assets/1027c280-4068-40be-927d-34be4919275f" />
+<img width="120" height="262" alt="Simulator Screenshot - iPhone 17 - 2026-11-11 at 09 51 17" src="https://github.com/user-attachments/assets/80f65282-0b4a-4af6-bfc2-26e3cc81aaab" />
+<img width="120" height="262" alt="Simulator Screenshot - iPhone 17 - 2026-11-11 at 09 51 24" src="https://github.com/user-attachments/assets/a80bffc6-7c1a-41e7-bc9c-bcf3986d0ea5" />
+<img width="120" height="262" alt="Simulator Screenshot - iPhone 17 - 2026-11-11 at 09 51 32" src="https://github.com/user-attachments/assets/e6b9a4bf-b92a-4f1e-a994-ea59eb8091c1" />
+
+
+
+
+
 ## Overview
 
 Motivi supports:
