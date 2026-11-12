@@ -6,11 +6,7 @@ import {
   Animated,
 } from "react-native";
 import colors from "../styles/colors";
-import {
-  NavigationRoute,
-  ParamListBase,
-} from "expo-router/build/react-navigation/routers";
-import { BottomTabNavigationOptions } from "expo-router/build/react-navigation/bottom-tabs";
+import { BottomTabNavigationOptions } from "expo-router/tabs";
 import { useEffect, useRef } from "react";
 import { Feather, Ionicons } from "@expo/vector-icons";
 

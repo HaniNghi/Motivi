@@ -305,7 +305,44 @@ search for "Korean noodle", call off -> write in db -> second time search for "K
   
 "Korean Noodle Soup" ✅ kept!
 
-
+## Deploy frontend with Expo Go app
+On my phone, the installed version was for SDK 58.0.0 but my project ran on SDK 57
+-> 
   
+```
+cd frontend
+# 1. Install Expo SDK 58
+npx expo install expo@^58.0.0
+# 2. Automatically upgrade all Expo & React Native packages to versions compatible with SDK 58
+npx expo install --fix
+# 3. Verify with doctor
+npx expo-doctor
+# 4. Clear old Metro cache
+```
 
-  
+after checking with doctor
+```
+18/20 checks passed. 2 checks failed. Possible issues detected:
+Use the --verbose flag to see more details about passed checks.
+
+✖ Check that required peer dependencies are installed
+Missing peer dependency: expo-constants
+Required by: expo-router
+Advice:
+Install missing required peer dependency with "npx expo install expo-constants"
+Your app may crash outside of Expo Go without this dependency. Native module peer dependencies must be installed directly.
+
+✖ Validate packages against React Native Directory package metadata
+The following issues were found when validating your dependencies against React Native Directory:
+  Unmaintained: @react-native-community/blur
+Advice:
+Use libraries that are actively maintained and support the New Architecture. Find alternative libraries with https://reactnative.directory.
+Add packages to expo.doctor.reactNativeDirectoryCheck.exclude in package.json to selectively skip validations, if the warning is not relevant.
+
+2 checks failed, indicating possible issues with the project.
+```
+Ask AI -> 
+npx expo install expo-constants
+npm uninstall @react-native-community/blur
+
+-> 20/20 checks passed. No issues detected!
