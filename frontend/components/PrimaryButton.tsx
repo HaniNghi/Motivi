@@ -1,0 +1,55 @@
+import { TouchableOpacity, View, Text, StyleSheet, DimensionValue } from "react-native";
+import keys from "../styles/keys";
+import { LinearGradient } from "expo-linear-gradient";
+import colors from "../styles/colors";
+
+interface PrimaryButtonProps {
+  text: string,
+  onPress: () => void,
+  primary: boolean,
+  width?: DimensionValue,
+  height?: DimensionValue,
+  textSize?: number
+}
+
+export default function PrimaryButton({text, onPress, primary, width = 100, height = 36, textSize = 12} : PrimaryButtonProps) {
+  return (
+    <View style={[styles.btnContainer, {width: width}]}>
+          <TouchableOpacity
+            style={[styles.primaryButton, {height: height}]}
+            activeOpacity={0.8}
+            onPress={onPress}
+          >
+            {primary && 
+            <LinearGradient
+              colors={colors.primaryGradient}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 1, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />}
+            <Text style={[styles.primaryButtonText, primary && {color: colors.textWhite}, {fontSize: textSize}]}>{text}</Text>
+          </TouchableOpacity>
+          
+        </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  btnContainer: {
+    marginTop: 20,
+  },
+  primaryButton: {
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    backgroundColor: colors.textWhite,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    overflow: 'hidden' as const,
+    borderWidth: 1,
+    borderColor: colors.page
+  },
+  primaryButtonText: {
+    color: colors.textMuted,
+    fontFamily: 'PlusJakartaSans-Bold',
+  }
+})

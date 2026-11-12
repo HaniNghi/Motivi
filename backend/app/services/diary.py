@@ -7,6 +7,9 @@ from app.services.foods import get_visible_food
 from app.database import db
 
 def dump_entry(entry: DiaryEntry) -> dict:
+    image_url = getattr(entry, "image_url", None)
+    if not image_url and getattr(entry, "food", None):
+        image_url = getattr(entry.food, "image_url", None)
     return {
         "id": str(entry.id),
         "food_id": str(entry.food_id),
@@ -15,7 +18,8 @@ def dump_entry(entry: DiaryEntry) -> dict:
         "calories": int(entry.calories),
         "protein_g": float(entry.protein_g),
         "carbs_g": float(entry.carbs_g),
-        "fat_g": float(entry.fat_g)
+        "fat_g": float(entry.fat_g),
+        "image_url": image_url,
     }
 
 def diary_day_payload(user: User, day: date) -> dict:

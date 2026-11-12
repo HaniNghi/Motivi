@@ -4,16 +4,15 @@ class OffUnavailable(Exception):
     pass
 
 def off_search_params(query: str, page_size: int=20) -> dict:
-    return{
+    return {
         "search_terms": query,
-        "search_simple": 1,
         "action": "process",
         "json": 1,
         "page_size": page_size,
-        "lc": "en",
         "tagtype_0": "languages",
         "tag_contains_0": "contains",
-        "tag_0":"en",
+        "tag_0": "en",
+        "fields": "code,_id,product_name,product_name_en,generic_name,brands,nutriments,image_front_small_url,image_url",
     }
 
 def _nutrient(nutriments: dict, *keys):

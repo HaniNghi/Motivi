@@ -1,12 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
+import { BottomTabBarProps } from "expo-router/tabs";
 import colors from "../styles/colors";
 import TabButton from "./TabButton";
 
 export default function MyTabBar({
   state,
   descriptors,
-  navigation,
+  emitter,
+  navigateToTab,
 }: BottomTabBarProps) {
 
   return (
@@ -29,19 +30,19 @@ export default function MyTabBar({
         const isFocused = state.index === index;
 
         const onPress = () => {
-          const event = navigation.emit({
+          const event = emitter.emit({
             type: "tabPress",
             target: route.key,
             canPreventDefault: true,
           });
 
           if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
+            navigateToTab(route.key);
           }
         };
 
         const onLongPress = () => {
-          navigation.emit({
+          emitter.emit({
             type: "tabLongPress",
             target: route.key,
           });

@@ -4,6 +4,8 @@ import {
   Text,
   DimensionValue,
   TouchableOpacity,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 import keys from "../styles/keys";
 import { ReactNode } from "react";
@@ -14,28 +16,32 @@ export default function WhiteContainer({
   children,
   width,
   titleColor,
+  titleFontsize,
   button = false,
   buttonPill = true,
   buttonTitle,
   onPress,
+  style,
 }: {
   title?: string;
   children?: ReactNode;
   width?: DimensionValue;
   titleColor?: string;
+  titleFontsize?: number;
   button?: boolean;
-  buttonPill?: boolean
+  buttonPill?: boolean;
   buttonTitle?: string;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 }) {
   const showHeader = Boolean(title || (button && buttonTitle));
 
   return (
-    <View style={[styles.heroCard, { width: width }]}>
+    <View style={[styles.heroCard, width !== undefined && { width }, style]}>
       {showHeader && (
         <View style={styles.header}>
           {title ? (
-            <Text style={[styles.title, titleColor && { color: titleColor }]}>
+            <Text style={[styles.title, titleColor && { color: titleColor, fontSize: titleFontsize }]}>
               {title}
             </Text>
           ) : (

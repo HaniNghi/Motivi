@@ -16,10 +16,14 @@ export default function CalorieInfo({eaten, left, target, fontSize}: CalorieInfo
         <Text style={[styles.number, {color: colors.primary, fontSize: fontSize}]}>{eaten}</Text>
         <Text style={[styles.text, {fontSize: fontSize - 4}]}>Eaten</Text>
       </View>
-      <View>
+      { left >=0 && <View>
         <Text style={[styles.number, {color: colors.teal, fontSize: fontSize}]}>{left}</Text>
         <Text style={[styles.text, {fontSize: fontSize - 4}]}>Left</Text>
-      </View>
+      </View>}
+      { left <0 && <View>
+        <Text style={[styles.number, {color: colors.teal, fontSize: fontSize}]}>{-left}</Text>
+        <Text style={[styles.text, {fontSize: fontSize - 4}]}>Over</Text>
+      </View>}
       <View>
         <Text style={[styles.number, {color: colors.textSoft, fontSize: fontSize}]}>{target}</Text>
         <Text style={[styles.text, {fontSize: fontSize - 4}]}>Target</Text>

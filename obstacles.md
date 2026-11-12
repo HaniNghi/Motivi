@@ -272,7 +272,105 @@ flask db upgrade
 flask run --port=5000
 
   
+## Diary
+Have to format the food name before display
+Picture link can not be displayed => 
+  In backend/app/services/diary.py, the dump_entry serializer was returning calories and macros, but omitted image_url. Because of this, GET /api/diary was returning entry.image_url as undefined, so EntryFood was receiving nothing.
 
-  
+  OpenFoodFacts' image CDN (images.openfoodfacts.org) often blocks or rate-limits image requests that lack a descriptive User-Agent header (which happens on mobile native image loaders).
 
+  Need to update EntryFood.tsx to automatically attach the required header and clean any whitespace from the URL
+
+Passing params between Diary and addfood
+onPress={() =>
+  router.push({
+    pathname: "/(food)/addfood",
+    params: { date: getDate(currentDate) },
+  })
+}
+
+export default function AddFood() {
+  const router = useRouter();
+  const { date } = useLocalSearchParams<{ date?: string }>();
+  const selectedDate = date ?? getDate(); 
+}
+## Food
+Add delay when user searching, prevent spaming to openfoodfact
+Change to v2 of openfoodfact but then change back to cgi/search because v2 cannot search brands-> cgi/search supports it better
+
+search for "Korean noodle", call off -> write in db -> second time search for "Korean noodle" -> only 4 results -> because the filtering foods in db too strict, it ignored every for example 
+"Korean Spicy Noodle" ❌ rejected (because "Spicy" is in the middle)
   
+"Korean Chicken Noodle" ❌ rejected (because "Chicken" is in the middle)
+  
+"Korean Noodle Soup" ✅ kept!
+
+## Deploy frontend with Expo Go app
+On my phone, the installed version was for SDK 58.0.0 but my project ran on SDK 57
+-> 
+  
+```
+cd frontend
+# 1. Install Expo SDK 58
+npx expo install expo@^58.0.0
+# 2. Automatically upgrade all Expo & React Native packages to versions compatible with SDK 58
+npx expo install --fix
+# 3. Verify with doctor
+npx expo-doctor
+# 4. Clear old Metro cache
+```
+
+after checking with doctor
+```
+18/20 checks passed. 2 checks failed. Possible issues detected:
+Use the --verbose flag to see more details about passed checks.
+
+✖ Check that required peer dependencies are installed
+Missing peer dependency: expo-constants
+Required by: expo-router
+Advice:
+Install missing required peer dependency with "npx expo install expo-constants"
+Your app may crash outside of Expo Go without this dependency. Native module peer dependencies must be installed directly.
+
+✖ Validate packages against React Native Directory package metadata
+The following issues were found when validating your dependencies against React Native Directory:
+  Unmaintained: @react-native-community/blur
+Advice:
+Use libraries that are actively maintained and support the New Architecture. Find alternative libraries with https://reactnative.directory.
+Add packages to expo.doctor.reactNativeDirectoryCheck.exclude in package.json to selectively skip validations, if the warning is not relevant.
+
+2 checks failed, indicating possible issues with the project.
+```
+Ask AI -> 
+npx expo install expo-constants
+npm uninstall @react-native-community/blur
+
+-> 20/20 checks passed. No issues detected!
+
+-> failed because only for developer, if anyone want to access to the app through Expo Go, has to be logged in with account 
+-> 2 options to deploy frontend 1 with Expo's EAS Hosting one with Vercel
+
+-> chose Vercel because "Auto-deploy on git push", larger Free Tier Limits	
+
+-> how to do :
+modify storage so when Platform.OS === 'web' then use localStorage instead of SecureStore
+-> next
+```
+create vercel.json inside frontend/ with the build command (npx expo export --platform web), output directory (dist), and SPA routing rules, and added .vercel to frontend/.gitignore.
+```
+-> next
+```
+cd frontend
+npx expo install react-dom react-native-web
+```
+-> next
+```
+- Go to vercel.com and click Sign Up / Log In with GitHub.
+- Click Add New... -> Project, and select your Motivi repository (Import).
+- On the configuration screen, set these 2 settings:
+- Root Directory: Click Edit and select frontend (Very important since your Expo app is inside the frontend/ folder!)
+- Environment Variables: Expand this section and add:
+- Key: EXPO_PUBLIC_BACKEND_API_URL
+- Value: Your deployed backend URL
+- Click Deploy!
+```

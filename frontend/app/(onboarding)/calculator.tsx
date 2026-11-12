@@ -15,7 +15,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { createUser } from "../../services/auth";
-import { ActiveLevel, ApiError, CreateProfile, CreateUser, Gender, Goal } from "../../lib/types";
+import {
+  ActiveLevel,
+  ApiError,
+  CreateProfile,
+  CreateUser,
+  Gender,
+  Goal,
+} from "../../lib/types";
 import { useRouter } from "expo-router";
 import WhiteContainer from "../../components/WhiteContainer";
 import SmallGradientButton from "../../components/SmallGradientButton";
@@ -27,7 +34,7 @@ const screenWidth = Dimensions.get("window").width;
 export default function Signup() {
   const router = useRouter();
 
-  const { refreshMe } = useAuth(); 
+  const { refreshMe } = useAuth();
 
   const [age, setAge] = useState("");
   const [ageErrorMessage, setAgeErrorMessage] = useState("");
@@ -48,7 +55,7 @@ export default function Signup() {
     if (ageErrorMessage) {
       setAgeErrorMessage("");
     }
-  }
+  };
 
   const handleAgeBlur = () => {
     const num = Number(age);
@@ -57,7 +64,7 @@ export default function Signup() {
       setAgeErrorMessage("Age cannot be empty.");
     } else if (isNaN(num)) {
       setAgeErrorMessage("Age must be a number.");
-    } else if (num < 14 || num > 100 ) {
+    } else if (num < 14 || num > 100) {
       setAgeErrorMessage("Age must be between 14 and 100.");
     }
   };
@@ -68,7 +75,7 @@ export default function Signup() {
     if (heightErrorMessage) {
       setHeightErrorMessage("");
     }
-  }
+  };
 
   const handleHeightBlur = () => {
     const num = Number(height);
@@ -82,39 +89,46 @@ export default function Signup() {
     }
   };
 
-const isAgeValid = (): boolean =>{
+  const isAgeValid = (): boolean => {
     const number = Number(age);
 
     if (!age || isNaN(number) || number < 14 || number > 100) {
       return false;
     }
     return true;
-  }
+  };
 
-  const isHeightValid = (): boolean =>{
+  const isHeightValid = (): boolean => {
     const number = Number(height);
 
     if (!height || isNaN(number) || number < 100 || number > 250) {
       return false;
     }
     return true;
-  }
+  };
 
-  const isWeightValid = (): boolean =>{
+  const isWeightValid = (): boolean => {
     const number = Number(weight);
 
     if (!weight || isNaN(number) || number < 30 || number > 300) {
       return false;
     }
     return true;
-  }
+  };
 
   const isValid = (): boolean => {
-    if(!isAgeValid() || !gender || !isHeightValid() || !isWeightValid() || !activity || !goal) {
+    if (
+      !isAgeValid() ||
+      !gender ||
+      !isHeightValid() ||
+      !isWeightValid() ||
+      !activity ||
+      !goal
+    ) {
       return false;
     }
     return true;
-  }
+  };
 
   const handleWeightChange = (weight: string) => {
     setWeight(weight);
@@ -122,7 +136,7 @@ const isAgeValid = (): boolean =>{
     if (weightErrorMessage) {
       setWeightErrorMessage("");
     }
-  }
+  };
 
   const handleWeightBlur = () => {
     const num = Number(weight);
@@ -134,7 +148,7 @@ const isAgeValid = (): boolean =>{
     } else if (num < 30 || num > 300) {
       setWeightErrorMessage("Weight must be between 30 and 300.");
     }
-  }
+  };
 
   const handleCalculator = async () => {
     handleAgeBlur();
@@ -162,7 +176,10 @@ const isAgeValid = (): boolean =>{
         router.replace("/result");
       }
     } catch (error: any) {
-      if (error.code === "profile_exists" || error.message === "Profile already exists.") {
+      if (
+        error.code === "profile_exists" ||
+        error.message === "Profile already exists."
+      ) {
         try {
           const result = await editProfile(payloadPostMe);
           if (result) {
@@ -179,7 +196,6 @@ const isAgeValid = (): boolean =>{
       Alert.alert("Fail to create profile", error.message);
     }
   };
-
 
   return (
     <SafeAreaProvider>
@@ -205,8 +221,8 @@ const isAgeValid = (): boolean =>{
                     onBlur={handleAgeBlur}
                   />
                   {ageErrorMessage ? (
-                        <Text style={styles.errorText}>{ageErrorMessage}</Text>
-                      ) : null}
+                    <Text style={styles.errorText}>{ageErrorMessage}</Text>
+                  ) : null}
                 </View>
                 <View style={styles.input}>
                   <Text style={styles.inputLabel}>Gender</Text>
@@ -240,12 +256,14 @@ const isAgeValid = (): boolean =>{
                         placeholder="162"
                         placeholderTextColor={colors.textSoft}
                         value={height}
-                        onChangeText={(value) =>handleHeightChange(value)}
+                        onChangeText={(value) => handleHeightChange(value)}
                         onBlur={handleHeightBlur}
                         keyboardType="numeric"
                       />
                       {heightErrorMessage ? (
-                        <Text style={styles.errorText}>{heightErrorMessage}</Text>
+                        <Text style={styles.errorText}>
+                          {heightErrorMessage}
+                        </Text>
                       ) : null}
                     </View>
                     <View style={styles.inRow}>
@@ -257,12 +275,14 @@ const isAgeValid = (): boolean =>{
                         placeholder="60"
                         placeholderTextColor={colors.textSoft}
                         value={weight}
-                        onChangeText={(value) =>handleWeightChange(value)}
+                        onChangeText={(value) => handleWeightChange(value)}
                         onBlur={handleWeightBlur}
                         keyboardType="numeric"
                       />
                       {weightErrorMessage ? (
-                        <Text style={styles.errorText}>{weightErrorMessage}</Text>
+                        <Text style={styles.errorText}>
+                          {weightErrorMessage}
+                        </Text>
                       ) : null}
                     </View>
                   </View>
@@ -351,6 +371,9 @@ const isAgeValid = (): boolean =>{
               />
               <Text style={keys.primaryButtonText}>Calculate my target</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
+              <Text style={styles.subText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -412,7 +435,6 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     width: "100%",
-    marginTop: 20,
   },
   gradient: {
     flex: 1,
@@ -479,4 +501,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 10,
   },
+  cancelBtn: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  }
 });
