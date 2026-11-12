@@ -12,12 +12,12 @@ export default function Index() {
     return <Loading spinner={true} />
   }
 
-  if (!onboardingCompleted) {
-    return <Redirect href="/(onboarding)/calculator"/>
-  }
-
   if (!user) {
     return <Redirect href="/loading"/>
+  }
+
+  if (!onboardingCompleted) {
+    return <Redirect href="/(onboarding)/calculator"/>
   }
   
   return <Redirect href="/(tabs)" />;
