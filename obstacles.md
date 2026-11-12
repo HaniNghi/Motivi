@@ -346,3 +346,31 @@ npx expo install expo-constants
 npm uninstall @react-native-community/blur
 
 -> 20/20 checks passed. No issues detected!
+
+-> failed because only for developer, if anyone want to access to the app through Expo Go, has to be logged in with account 
+-> 2 options to deploy frontend 1 with Expo's EAS Hosting one with Vercel
+
+-> chose Vercel because "Auto-deploy on git push", larger Free Tier Limits	
+
+-> how to do :
+modify storage so when Platform.OS === 'web' then use localStorage instead of SecureStore
+-> next
+```
+create vercel.json inside frontend/ with the build command (npx expo export --platform web), output directory (dist), and SPA routing rules, and added .vercel to frontend/.gitignore.
+```
+-> next
+```
+cd frontend
+npx expo install react-dom react-native-web
+```
+-> next
+```
+- Go to vercel.com and click Sign Up / Log In with GitHub.
+- Click Add New... -> Project, and select your Motivi repository (Import).
+- On the configuration screen, set these 2 settings:
+- Root Directory: Click Edit and select frontend (Very important since your Expo app is inside the frontend/ folder!)
+- Environment Variables: Expand this section and add:
+- Key: EXPO_PUBLIC_BACKEND_API_URL
+- Value: Your deployed backend URL
+- Click Deploy!
+```
