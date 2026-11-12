@@ -1,10 +1,16 @@
-import { StyleSheet } from "react-native";
+import { Alert, Platform, StyleSheet } from "react-native";
 import Loading from "./loading";
 import Login from "./(auth)/login";
 import Signup from "./(auth)/signup";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { AuthProvider } from "../context/AuthContext";
+
+if (Platform.OS === "web" && typeof window !== "undefined") {
+  Alert.alert = (title: string, message?: string) => {
+    window.alert(message ? `${title}\n${message}` : title);
+  };
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
