@@ -10,28 +10,15 @@ from .database import db, migrate
 
 
 def _database_uri() -> str:
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        return database_url
-
-    password_file = os.getenv("POSTGRES_PASSWORD_FILE")
-    if password_file:
-        password = Path(password_file).read_text().strip()
-    else:
-        password = os.getenv("POSTGRES_PASSWORD")
-        if not password:
-            default_secret = (
-                Path(__file__).resolve().parents[2] / "db" / "password.txt"
-            )
-            if default_secret.exists():
-                password = default_secret.read_text().strip()
+   
+    password = os.getenv("POSTGRES_PASSWORD")
 
     if not password:
         raise RuntimeError(
-            "Set DATABASE_URL, POSTGRES_PASSWORD, or POSTGRES_PASSWORD_FILE "
+            "Set POSTGRES_PASSWORD"
             "to configure the database password."
         )
-
+    # Define DB_HOST, PORT in .env when not using localhost
     return URL.create(
         drivername="postgresql+psycopg",
         username=os.getenv("POSTGRES_USER", "motivi"),
@@ -44,9 +31,7 @@ def _database_uri() -> str:
 
 def create_app(config: dict[str, Any] | None = None):
     app = Flask(__name__)
-    database_uri = (
-        config.get("SQLALCHEMY_DATABASE_URI") if config is not None else None
-    ) or _database_uri()
+    database_uri = _database_uri()
     cors_origins = [
         origin.strip()
         for origin in os.getenv("CORS_ORIGINS", "").split(",")

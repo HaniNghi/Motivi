@@ -7,5 +7,7 @@
 # Ignore .env
 .env
 .certs
+# Python cache
 __pycache__/
 *.py[cod]
+*$py.class
