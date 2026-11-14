@@ -4,7 +4,7 @@ from marshmallow import ValidationError
 from app.routes.deps import require_auth
 from app.errors import error_response, first_martshmallow_message
 from app.schemas.foods import CustomFoodSchema
-from app.services.foods import create_custom_food, search_foods, dump_food
+from app.services.foods import create_custom_food, list_saved_food, search_foods, dump_food
 from app.services.off import OffUnavailable 
 
 foods = Blueprint("foods", __name__, url_prefix="/api/foods")
@@ -47,3 +47,9 @@ def post_custom(user):
         return error_response("invalid_body", first_martshmallow_message(exc), 400)
     food = create_custom_food(user, data)
     return jsonify({"food": dump_food(food)}), 201
+
+@foods.get("/saved")
+@require_auth
+def get_saved_foods(user):
+    saved_foods = list_saved_food(user)
+    return jsonify({"saved_food": saved_foods}), 200
