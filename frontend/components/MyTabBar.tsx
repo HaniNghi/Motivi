@@ -1,7 +1,14 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
 import { BottomTabBarProps } from "expo-router/tabs";
 import colors from "../styles/colors";
 import TabButton from "./TabButton";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function MyTabBar({
   state,
@@ -9,7 +16,6 @@ export default function MyTabBar({
   emitter,
   navigateToTab,
 }: BottomTabBarProps) {
-
   return (
     <View style={styles.tabbar}>
       {state.routes.map((route, index) => {
@@ -49,7 +55,7 @@ export default function MyTabBar({
         };
 
         return (
-          <TabButton 
+          <TabButton
             key={route.name}
             routeName={route.name}
             onPress={onPress}
@@ -66,16 +72,15 @@ export default function MyTabBar({
 
 const styles = StyleSheet.create({
   tabbar: {
-    position: 'absolute',
-    bottom: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    position: "absolute",
+    bottom: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: colors.textWhite,
-    width: '100%',
+    width: "100%",
     height: 55,
     paddingVertical: 8,
     paddingHorizontal: 10,
   },
-})
-
+});

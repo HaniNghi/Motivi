@@ -182,7 +182,7 @@ export default function Home() {
           </View>
           <View>
             <ImageCard
-              picLink={require("../../assets/login-banner.png")}
+              picLink={require("../../assets/home-banner.png")}
               width={"100%"}
               title="Recalculate your plan"
               sub="Update your calorie target"

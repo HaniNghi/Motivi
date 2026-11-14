@@ -154,3 +154,6 @@ Motivi is actively being developed as a nutrition-tracking MVP with a backend AP
 
 ## Images
 https://www.flaticon.com/
+Login banner : https://www.megapixl.com/keto-diet-foods-stock-photo-61500209790
+Graph banner: https://www.megapixl.com/sliced-kiwi-fruit-stock-photo-16001125945
+Home banner: https://www.megapixl.com/cereal-muesli-granola-berries-breakfast-stock-photo-2131943550

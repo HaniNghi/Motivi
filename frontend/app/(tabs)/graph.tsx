@@ -151,7 +151,7 @@ export default function Graph() {
           </WhiteContainer>
         </View>
         <ImageCard
-          picLink={require("../../assets/login-banner.png")}
+          picLink={require("../../assets/graph-banner.png")}
           width={"90%"}
           title="Calories only"
           sub="No macro tracking"
