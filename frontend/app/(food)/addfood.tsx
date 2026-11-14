@@ -12,17 +12,23 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import WhiteContainer from "../../components/WhiteContainer";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getDate, shortDatetime } from "../../lib/utils";
-import { DiaryDaySession, Entry, EntryPayload, Food, SearchedFood } from "../../lib/types";
+import {
+  DiaryDaySession,
+  Entry,
+  EntryPayload,
+  Food,
+  SearchedFood,
+} from "../../lib/types";
 import { getDiaryDay, postEntry } from "../../services/diary";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import colors from "../../styles/colors";
 import EntryFood from "../../components/EntryFood";
 import AddEntry from "../../components/AddEntry";
-import { getFoods } from "../../services/food";
+import { get_saved_food, getFoods } from "../../services/food";
 
 export default function AddFood() {
   const router = useRouter();
-  const { date } = useLocalSearchParams<{date: string}>();
+  const { date } = useLocalSearchParams<{ date: string }>();
   const [today, setToday] = useState<Date>(new Date());
   const [searchedFoods, setSearchedFoods] = useState<Food[]>();
   const [inputFood, setInputFood] = useState<string>();
@@ -30,6 +36,7 @@ export default function AddFood() {
   const [clickedFood, setClickedFood] = useState<Food>();
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"all" | "saved">("all");
 
   const foods = searchedFoods ?? [];
 
@@ -39,6 +46,7 @@ export default function AddFood() {
         limit = 20;
       }
       setIsLoading(true);
+      setErrorMsg(undefined);
       try {
         const result = await getFoods(input, limit);
         setSearchedFoods(result.foods);
@@ -51,7 +59,25 @@ export default function AddFood() {
     [],
   );
 
+  const fetchSavedFoods = async () => {
+    setIsLoading(true);
+    setErrorMsg(undefined);
+    try {
+      const result = await get_saved_food();
+      if (result.length < 1) {
+        setErrorMsg("No saved foods");
+      }
+      setSearchedFoods(result);
+    } catch (error: any) {
+      setErrorMsg(`${error.code} ${error.message}`);
+    } finally {
+      setIsLoading(false);
+      setInputFood("");
+    }
+  };
+
   useEffect(() => {
+    if (activeTab !== "all") return;
     const trimmed = (inputFood ?? "").trim();
     if (!trimmed) {
       fetchSearchedFoods("", 20);
@@ -77,15 +103,15 @@ export default function AddFood() {
     const payload: EntryPayload = {
       food_id: food.id,
       date: date,
-      amount_g: amountG
-    }
+      amount_g: amountG,
+    };
 
     try {
       await postEntry(payload);
     } catch (error: any) {
-      Alert.alert("Failed to add a food", error.message)
+      Alert.alert("Failed to add a food", error.message);
     }
-  }
+  };
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -108,11 +134,47 @@ export default function AddFood() {
             />
           </View>
           <View style={styles.options}>
-            <TouchableOpacity style={styles.backButton} activeOpacity={0.7}>
-              <Text style={styles.backButtonText}>All</Text>
+            <TouchableOpacity
+              style={[
+                styles.backButton,
+                activeTab === "all" && { backgroundColor: colors.primary },
+              ]}
+              activeOpacity={0.7}
+              onPress={() => {
+                setErrorMsg(undefined);
+                setActiveTab("all");
+                fetchSearchedFoods((inputFood ?? "").trim(), 20);
+              }}
+            >
+              <Text
+                style={[
+                  styles.backButtonText,
+                  activeTab === "all" && { color: colors.textWhite },
+                ]}
+              >
+                All
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.backButton} activeOpacity={0.7}>
-              <Text style={styles.backButtonText}>Saved</Text>
+            <TouchableOpacity
+              style={[
+                styles.backButton,
+                activeTab === "saved" && { backgroundColor: colors.primary },
+              ]}
+              activeOpacity={0.7}
+              onPress={() => {
+                setErrorMsg(undefined);
+                setActiveTab("saved");
+                fetchSavedFoods();
+              }}
+            >
+              <Text
+                style={[
+                  styles.backButtonText,
+                  activeTab === "saved" && { color: colors.textWhite },
+                ]}
+              >
+                Saved
+              </Text>
             </TouchableOpacity>
           </View>
         </WhiteContainer>
@@ -129,8 +191,8 @@ export default function AddFood() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
               >
-                {foods.length === 0 ? (
-                  <Text style={styles.infoText}>No food</Text>
+                {errorMsg ? (
+                  <Text style={styles.infoText}>{errorMsg}</Text>
                 ) : (
                   foods.map((food) => (
                     <EntryFood
@@ -163,13 +225,14 @@ export default function AddFood() {
         >
           <Text style={styles.backButtonText}>+ Create custom food</Text>
         </TouchableOpacity>
-        {clickedFood &&
-        <AddEntry
-          modalVisible={addModalVisible}
-          food={clickedFood}
-          onClose={() => setAddModalVisible(false)}
-          onAdd={(amountG, food) => addEntry(amountG, food)}
-        />}
+        {clickedFood && (
+          <AddEntry
+            modalVisible={addModalVisible}
+            food={clickedFood}
+            onClose={() => setAddModalVisible(false)}
+            onAdd={(amountG, food) => addEntry(amountG, food)}
+          />
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -243,8 +306,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "PlusJakartaSans-Regular",
     color: colors.textMuted,
-    alignSelf: 'flex-end',
-    marginRight: 20
+    alignSelf: "flex-end",
+    marginRight: 20,
   },
   scrollView: {
     flex: 1,
