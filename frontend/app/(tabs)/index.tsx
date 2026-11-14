@@ -163,7 +163,7 @@ export default function Home() {
               main="Diary"
               sub="Today's log"
               colors={colors.diaryGradient}
-              picLink={require("../../assets/fire.png")}
+              picLink={require("../../assets/notebook.png")}
               onPress={() => {
                 router.push("/diary");
               }}
@@ -172,7 +172,7 @@ export default function Home() {
               main="Weekly"
               sub="See progress"
               colors={colors.weeklyGradient}
-              picLink={require("../../assets/fire.png")}
+              picLink={require("../../assets/bar-graph.png")}
               onPress={() => {
                 router.push("/graph");
               }}
@@ -275,6 +275,6 @@ const styles = StyleSheet.create({
     flex: 1, 
     paddingLeft: "4%", 
     paddingRight: "4%",
-    marginBottom: "10%", 
+    paddingBottom: "10%", 
   },
 });
