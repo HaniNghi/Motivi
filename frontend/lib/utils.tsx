@@ -70,7 +70,9 @@ export function imageSource(
     return {
       uri: trimmed,
       headers: {
-        "User-Agent": process.env.OFF_USER_AGENT || "MotiviApp/1.0",
+        "User-Agent":
+          process.env.OFF_USER_AGENT ||
+          "Motivi - App and Web - Version 1.0 - vmmn27@gmail.com",
       },
     };
   }

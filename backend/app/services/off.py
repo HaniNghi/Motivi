@@ -98,14 +98,18 @@ def map_off_products(item: dict) -> dict | None:
 def search_open_food_facts(query: str, page_size: int = 20) -> list[dict]:
     url = "https://world.openfoodfacts.org/cgi/search.pl"
     params = off_search_params(query, page_size)
-    headers = {"User-Agent": os.getenv("OFF_USER_AGENT") or "MotiviApp/1.0"}
+    headers = {
+        "User-Agent": os.getenv("OFF_USER_AGENT")
+        or "Motivi - App and Web - Version 1.0 - vmmn27@gmail.com"
+    }
     try:
-        response = httpx.get(url, params=params, headers=headers, timeout=12.0)
+        response = httpx.get(url, params=params, headers=headers, timeout=20.0)
         response.raise_for_status()
         payload = response.json()
         if not isinstance(payload, dict):
             raise ValueError("Open Food Facts response was not a JSON object")
     except Exception as exc:
+        print(f"[OFF ERROR] {type(exc).__name__}: {exc}")
         raise OffUnavailable from exc
 
     products = []

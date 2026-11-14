@@ -22,3 +22,8 @@ env/
 # OS files
 .DS_Store
 Thumbs.db
+.certs
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class

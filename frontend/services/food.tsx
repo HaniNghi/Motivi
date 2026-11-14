@@ -29,3 +29,16 @@ export async function postCustomFood(payload: CustomPayload): Promise<Food>{
     }
 }
 
+export async function get_saved_food(): Promise<Food[]> {
+    try {
+        const response = await callApi("GET", `/foods/saved`, null, true)
+        if (!response.ok) {
+            const err = await handleError(response);
+            throw err;
+        }
+        const data: { saved_food: Food[] } = await response.json();
+        return data.saved_food;
+    } catch (error: any) {
+        throw error;
+    }
+}
