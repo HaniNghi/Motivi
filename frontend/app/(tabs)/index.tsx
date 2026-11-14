@@ -1,6 +1,13 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import CalorieInfo from "../../components/CalorieInfo";
 import CircleIndicator from "../../components/CircleIndicator";
@@ -99,7 +106,7 @@ export default function Home() {
             source={require("../../assets/logo.png")}
           />
         </View>
-        <ScrollView style={{ flex: 1, paddingLeft: '4%', paddingRight: '4%' }}>
+        <ScrollView style={styles.scrollView}>
           <WhiteContainer width={"100%"}>
             <View style={styles.inRow}>
               <View>
@@ -146,7 +153,10 @@ export default function Home() {
               colors={colors.primaryGradient}
               picLink={require("../../assets/fire.png")}
               onPress={() => {
-                router.push({pathname: "/(food)/addfood", params: {date: date}});
+                router.push({
+                  pathname: "/(food)/addfood",
+                  params: { date: date },
+                });
               }}
             />
             <SquareCard
@@ -177,7 +187,13 @@ export default function Home() {
               buttonPill={false}
               onPress={() => router.push("/graph")}
             >
-              {weekAnalytics && <Chart width={screenWidth*0.8} rawData={weekAnalytics} small={true} />}
+              {weekAnalytics && (
+                <Chart
+                  width={screenWidth * 0.8}
+                  rawData={weekAnalytics}
+                  small={true}
+                />
+              )}
             </WhiteContainer>
           </View>
           <View>
@@ -254,5 +270,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "PlusJakartaSans-SemiBold",
     color: colors.text,
+  },
+  scrollView: { 
+    flex: 1, 
+    paddingLeft: "4%", 
+    paddingRight: "4%",
+    marginBottom: "10%", 
   },
 });

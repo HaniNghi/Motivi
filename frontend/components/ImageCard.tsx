@@ -35,7 +35,7 @@ export default function ImageCard({
 }) {
   return (
     <View style={[styles.heroCard, { width: width, height: height }]}>
-      <View>
+      <View style={StyleSheet.absoluteFill}>
         <Image style={styles.image} source={picLink} resizeMode="cover" />
         <LinearGradient
           colors={colors.primaryGradient}

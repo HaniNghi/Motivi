@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -22,24 +23,24 @@ export default function Profile() {
   const router = useRouter();
   const { user, profile, logout } = useAuth();
 
-  const genders = new Map<string,string> ([
+  const genders = new Map<string, string>([
     ["female", "Female"],
-    ["male", "Male"]
-  ])
+    ["male", "Male"],
+  ]);
 
-  const goals = new Map<string,string> ([
+  const goals = new Map<string, string>([
     ["lose", "Lose weight"],
     ["gain", "Gain weight"],
     ["maintain", "Maintain"],
-  ])
+  ]);
 
-  const activityLevels = new Map<string,string> ([
+  const activityLevels = new Map<string, string>([
     ["sedentary", "Sedentary"],
     ["light", "Light"],
     ["moderate", "Moderate"],
     ["active", "Active"],
     ["very_active", "Very active"],
-  ])
+  ]);
 
   const handleEditPlan = async () => {
     router.push("/(onboarding)/calculator");
@@ -53,74 +54,86 @@ export default function Profile() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.contentContainer}>
-        <WhiteContainer width="90%">
-          <Text style={styles.mainText}>
-            {user?.display_name ?? "Emty name"}
-          </Text>
-          <Text style={styles.subText}>{user?.email ?? "empty email"}</Text>
-        </WhiteContainer>
-        <WhiteContainer
-          title="Your plan"
-          width="90%"
-          titleColor={colors.text}
-          button={true}
-          buttonTitle="Edit plan"
-          onPress={handleEditPlan}
-        >
-          <RowImageContent
-            picLink={require("../../assets/fire.png")}
-            first="Daily target"
-            second={`${profile?.tdee.toString()} kcal`}
-          />
-          <RowImageContent
-            picLink={require("../../assets/target.png")}
-            first="Goal"
-            second={`${profile?.goal ? goals.get(profile?.goal): ""}`}
-          />
-          <RowImageContent
-            picLink={require("../../assets/training.png")}
-            first="Activity"
-            second={profile?.activity_level ? activityLevels.get(profile?.activity_level) : ""}
-          />
-        </WhiteContainer>
-        <WhiteContainer
-          title="Personal details"
-          width="90%"
-          titleColor={colors.text}
-        >
-          <View style={{flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center'}}>
-            <CardImageContainer
-              picLink={require("../../assets/age-range.png")}
-              firstText={`${profile?.age ?? ""} years`}
-              secondText="Age"
-              width="45%"
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <WhiteContainer width="90%">
+            <Text style={styles.mainText}>
+              {user?.display_name ?? "Emty name"}
+            </Text>
+            <Text style={styles.subText}>{user?.email ?? "empty email"}</Text>
+          </WhiteContainer>
+          <WhiteContainer
+            title="Your plan"
+            width="90%"
+            titleColor={colors.text}
+            button={true}
+            buttonTitle="Edit plan"
+            onPress={handleEditPlan}
+          >
+            <RowImageContent
+              picLink={require("../../assets/fire.png")}
+              first="Daily target"
+              second={`${profile?.tdee.toString()} kcal`}
             />
-            <CardImageContainer
-              picLink={require("../../assets/gender-fluid.png")}
-              firstText={`${profile?.gender ? genders.get(profile?.gender): null}`}
-              secondText="Gender"
-              width="45%"
+            <RowImageContent
+              picLink={require("../../assets/target.png")}
+              first="Goal"
+              second={`${profile?.goal ? goals.get(profile?.goal) : ""}`}
             />
-            <CardImageContainer
-              picLink={require("../../assets/ruler.png")}
-              firstText={`${profile?.height_cm ?? ""} cm`}
-              secondText="Height"
-              width="45%"
+            <RowImageContent
+              picLink={require("../../assets/training.png")}
+              first="Activity"
+              second={
+                profile?.activity_level
+                  ? activityLevels.get(profile?.activity_level)
+                  : ""
+              }
             />
-            <CardImageContainer
-              picLink={require("../../assets/weighing-scale.png")}
-              firstText={`${profile?.weight_kg ?? ""} kg`}
-              secondText="Weight"
-              width="45%"
-            />
-          </View>
-        </WhiteContainer>
+          </WhiteContainer>
+          <WhiteContainer
+            title="Personal details"
+            width="90%"
+            titleColor={colors.text}
+          >
+            <View
+              style={{
+                flexWrap: "wrap",
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
+              <CardImageContainer
+                picLink={require("../../assets/age-range.png")}
+                firstText={`${profile?.age ?? ""} years`}
+                secondText="Age"
+                width="45%"
+              />
+              <CardImageContainer
+                picLink={require("../../assets/gender-fluid.png")}
+                firstText={`${profile?.gender ? genders.get(profile?.gender) : null}`}
+                secondText="Gender"
+                width="45%"
+              />
+              <CardImageContainer
+                picLink={require("../../assets/ruler.png")}
+                firstText={`${profile?.height_cm ?? ""} cm`}
+                secondText="Height"
+                width="45%"
+              />
+              <CardImageContainer
+                picLink={require("../../assets/weighing-scale.png")}
+                firstText={`${profile?.weight_kg ?? ""} kg`}
+                secondText="Weight"
+                width="45%"
+              />
+            </View>
+          </WhiteContainer>
 
-        <View style={styles.criticalBtn}>
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={styles.criticalText}>Log out</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.criticalBtn}>
+            <TouchableOpacity onPress={handleLogout}>
+              <Text style={styles.criticalText}>Log out</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -129,7 +142,6 @@ export default function Profile() {
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: colors.page,
-    height: "100%",
     width: screenWidth,
     flex: 1,
   },
@@ -148,10 +160,16 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    alignItems: "center",
     paddingBottom: 5,
+    alignItems: "center",
     backgroundColor: colors.page,
     paddingTop: 0,
+  },
+  scrollView: {
+    width: '100%',
+  },
+  scrollContent: {
+    alignItems: "center",
   },
   criticalBtn: {
     width: "90%",
