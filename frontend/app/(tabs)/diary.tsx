@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -12,7 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getDate, shortDatetime } from "../../lib/utils";
 import CalorieInfo from "../../components/CalorieInfo";
 import { DiaryDaySession, Entry } from "../../lib/types";
-import { getDiaryDay } from "../../services/diary";
+import { deleteEntry, getDiaryDay, patchEntry } from "../../services/diary";
 import { useFocusEffect, useRouter } from "expo-router";
 import BarIndicator from "../../components/BarIndicator";
 import colors from "../../styles/colors";
@@ -30,7 +31,8 @@ export default function Diary() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [diaryDay, setDiaryDay] = useState<DiaryDaySession>();
   const [errorMsg, setErrorMsg] = useState<string>();
-
+  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const targetCalories = diaryDay?.target.calories ?? 0;
   const consumedCalories = diaryDay?.consumed.calories ?? 0;
@@ -66,6 +68,25 @@ export default function Diary() {
       nextDate.setDate(nextDate.getDate() + 1);
       return nextDate;
     });
+  };
+
+  const handleModifyEntry = async (amountG: number, entry: Entry) => {
+    if (!amountG || amountG <= 0) return;
+    try {
+      const updated = await patchEntry(entry.id, amountG);
+      setDiaryDay(updated);
+    } catch (error: any) {
+      Alert.alert("Failed to update entry", error.message || "An error occurred");
+    }
+  };
+
+  const handleDeleteEntry = async (entry: Entry) => {
+    try {
+      const updated = await deleteEntry(entry.id);
+      setDiaryDay(updated);
+    } catch (error: any) {
+      Alert.alert("Failed to delete entry", error.message || "An error occurred");
+    }
   };
 
   const isToday = getDate(currentDate) === getDate(new Date());
@@ -146,6 +167,10 @@ export default function Diary() {
                     carbs_g={entry.carbs_g}
                     fat_g={entry.fat_g}
                     picLink={entry.image_url}
+                    onPress={() => {
+                      setSelectedEntry(entry);
+                      setModalVisible(true);
+                    }}
                   />
                 ))
               )}
@@ -157,7 +182,12 @@ export default function Diary() {
               { alignSelf: "center", width: "100%", marginTop: "auto" },
             ]}
             activeOpacity={0.8}
-            onPress={()=> router.push({ pathname:"/(food)/addfood", params: {date: getDate(currentDate)}})}
+            onPress={() =>
+              router.push({
+                pathname: "/(food)/addfood",
+                params: { date: getDate(currentDate) },
+              })
+            }
           >
             <LinearGradient
               colors={colors.primaryGradient}
@@ -168,6 +198,19 @@ export default function Diary() {
             <Text style={keys.primaryButtonText}>+ Add food</Text>
           </TouchableOpacity>
         </View>
+
+        {selectedEntry && (
+          <AddEntry
+            modalVisible={modalVisible}
+            entry={selectedEntry}
+            onClose={() => {
+              setModalVisible(false);
+              setSelectedEntry(null);
+            }}
+            onModify={handleModifyEntry}
+            onDelete={handleDeleteEntry}
+          />
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );

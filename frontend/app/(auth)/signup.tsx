@@ -349,6 +349,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textMuted,
     fontFamily: "PlusJakartaSans-Regular",
+    marginBottom: 10,
   },
   signupBoldText: {
     color: colors.buttonPrimaryStart,

@@ -105,7 +105,7 @@ def search_foods(user: User, query: str, limit: int) -> tuple[list[Food], bool]:
     )
     return foods, fetched
 
-def list_saved_food(user: User) -> list[Food]:
+def list_saved_food(user: User) -> list[list]:
     saved_foods = ( Food.query.filter(and_(Food.created_by_user_id == user.id, Food.deleted_at.is_(None)) ))
     list = []
     for food in saved_foods:

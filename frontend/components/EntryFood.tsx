@@ -70,8 +70,14 @@ export default function EntryFood({
     return val.endsWith("g") ? val : `${val}g`;
   };
 
+  const isClickable = Boolean(onPress && !addButton);
+  const Container = isClickable ? TouchableOpacity : View;
+
   return (
-    <View style={[styles.container, { width }]}>
+    <Container
+      style={[styles.container, { width }]}
+      {...(isClickable ? { onPress, activeOpacity: 0.7 } : {})}
+    >
       <View style={styles.left}>
         <View style={styles.badge}>
           <Image
@@ -133,7 +139,7 @@ export default function EntryFood({
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </Container>
   );
 }
 
