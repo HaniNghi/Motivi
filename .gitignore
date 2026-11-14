@@ -1,8 +1,24 @@
-# Ignore database secret
-/db/password.txt
-
-# Python venv
-.venv/
-
-# Ignore .env
+# Environment & secrets
 .env
+.env.*
+!.env.example
+/db/password.txt
+.certs/
+*.pem
+*.key
+*.crt
+
+# Python caches & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
