@@ -72,11 +72,15 @@ describe("CustomFood Screen", () => {
 
       await fireEvent.changeText(input, "-10");
       await fireEvent(input, "blur");
-      expect(screen.getByText("Calories must be a number 0 or greater.")).toBeTruthy();
+      expect(screen.getByText("Calories must be between 0 and 2000.")).toBeTruthy();
+
+      await fireEvent.changeText(input, "2500");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Calories must be between 0 and 2000.")).toBeTruthy();
 
       await fireEvent.changeText(input, "not-a-number");
       await fireEvent(input, "blur");
-      expect(screen.getByText("Calories must be a number 0 or greater.")).toBeTruthy();
+      expect(screen.getByText("Calories must be between 0 and 2000.")).toBeTruthy();
     });
 
     it("displays validation error when protein is blurred empty or invalid", async () => {
@@ -88,7 +92,15 @@ describe("CustomFood Screen", () => {
 
       await fireEvent.changeText(input, "-5");
       await fireEvent(input, "blur");
-      expect(screen.getByText("Protein must be a number 0 or greater.")).toBeTruthy();
+      expect(screen.getByText("Protein must be between 0 and 100.")).toBeTruthy();
+
+      await fireEvent.changeText(input, "150");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Protein must be between 0 and 100.")).toBeTruthy();
+
+      await fireEvent.changeText(input, "not-a-number");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Protein must be between 0 and 100.")).toBeTruthy();
     });
 
     it("displays validation error when carbs is blurred empty or invalid", async () => {
@@ -98,9 +110,17 @@ describe("CustomFood Screen", () => {
       await fireEvent(input, "blur");
       expect(screen.getByText("Carbohydrates cannot be empty.")).toBeTruthy();
 
+      await fireEvent.changeText(input, "-1");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Carbohydrates must be between 0 and 100.")).toBeTruthy();
+
+      await fireEvent.changeText(input, "150");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Carbohydrates must be between 0 and 100.")).toBeTruthy();
+
       await fireEvent.changeText(input, "invalid");
       await fireEvent(input, "blur");
-      expect(screen.getByText("Carbohydrates must be a number 0 or greater.")).toBeTruthy();
+      expect(screen.getByText("Carbohydrates must be between 0 and 100.")).toBeTruthy();
     });
 
     it("displays validation error when fat is blurred empty or invalid", async () => {
@@ -112,7 +132,15 @@ describe("CustomFood Screen", () => {
 
       await fireEvent.changeText(input, "-1");
       await fireEvent(input, "blur");
-      expect(screen.getByText("Fat must be a number 0 or greater.")).toBeTruthy();
+      expect(screen.getByText("Fat must be between 0 and 100.")).toBeTruthy();
+
+      await fireEvent.changeText(input, "150");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Fat must be between 0 and 100.")).toBeTruthy();
+
+      await fireEvent.changeText(input, "invalid");
+      await fireEvent(input, "blur");
+      expect(screen.getByText("Fat must be between 0 and 100.")).toBeTruthy();
     });
   });
 
@@ -201,8 +229,26 @@ describe("CustomFood Screen", () => {
       await fireEvent.press(screen.getByText("Save food"));
 
       expect(foodService.postCustomFood).not.toHaveBeenCalled();
-      expect(screen.getByText("Calories must be a number 0 or greater.")).toBeTruthy();
-      expect(screen.getByText("Protein must be a number 0 or greater.")).toBeTruthy();
+      expect(screen.getByText("Calories must be between 0 and 2000.")).toBeTruthy();
+      expect(screen.getByText("Protein must be between 0 and 100.")).toBeTruthy();
+    });
+
+    it("halts submission when inputs exceed maximum limits", async () => {
+      await render(<CustomFood />);
+
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g Homemade granola"), "Apple");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 250"), "2500");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 10"), "150");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 30"), "120");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 8"), "110");
+
+      await fireEvent.press(screen.getByText("Save food"));
+
+      expect(foodService.postCustomFood).not.toHaveBeenCalled();
+      expect(screen.getByText("Calories must be between 0 and 2000.")).toBeTruthy();
+      expect(screen.getByText("Protein must be between 0 and 100.")).toBeTruthy();
+      expect(screen.getByText("Carbohydrates must be between 0 and 100.")).toBeTruthy();
+      expect(screen.getByText("Fat must be between 0 and 100.")).toBeTruthy();
     });
   });
 

@@ -146,7 +146,7 @@ export default function Graph() {
               source={require("../../assets/target.png")}
               resizeMode="contain"
             />
-            <Text style={styles.mainText}>{daysOnTarget} of 6</Text>
+            <Text style={styles.mainText}>{daysOnTarget} of 7</Text>
             <Text style={styles.subText}>Days on target</Text>
           </WhiteContainer>
         </View>

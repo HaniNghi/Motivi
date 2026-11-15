@@ -10,7 +10,7 @@ class CustomFoodSchema(Schema):
     )
     calories_per_100g = fields.Float(
         required=True,
-        validate=validate.Range(min=0, max=900),
+        validate=validate.Range(min=0, max=2000),
         error_messages={
             "required": "calories_per_100g is required."
         }

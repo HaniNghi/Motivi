@@ -69,8 +69,8 @@ export default function CustomFood() {
   const handleCaloriesBlur = () => {
     if (!calories.trim()) {
       setCaloriesErrorMessage("Calories cannot be empty.");
-    } else if (!isValidPositiveNumber(calories)) {
-      setCaloriesErrorMessage("Calories must be a number 0 or greater.");
+    } else if (!isValidPositiveNumber(calories) || Number(calories) > 2000) {
+      setCaloriesErrorMessage("Calories must be between 0 and 2000.");
     }
   };
 
@@ -84,8 +84,8 @@ export default function CustomFood() {
   const handleProteinBlur = () => {
     if (!protein.trim()) {
       setProteinErrorMessage("Protein cannot be empty.");
-    } else if (!isValidPositiveNumber(protein)) {
-      setProteinErrorMessage("Protein must be a number 0 or greater.");
+    } else if (!isValidPositiveNumber(protein) || Number(protein) > 100) {
+      setProteinErrorMessage("Protein must be between 0 and 100.");
     }
   };
 
@@ -99,8 +99,8 @@ export default function CustomFood() {
   const handleCarbsBlur = () => {
     if (!carbs.trim()) {
       setCarbsErrorMessage("Carbohydrates cannot be empty.");
-    } else if (!isValidPositiveNumber(carbs)) {
-      setCarbsErrorMessage("Carbohydrates must be a number 0 or greater.");
+    } else if (!isValidPositiveNumber(carbs)  || Number(carbs) > 100) {
+      setCarbsErrorMessage("Carbohydrates must be between 0 and 100.");
     }
   };
 
@@ -114,8 +114,8 @@ export default function CustomFood() {
   const handleFatBlur = () => {
     if (!fat.trim()) {
       setFatErrorMessage("Fat cannot be empty.");
-    } else if (!isValidPositiveNumber(fat)) {
-      setFatErrorMessage("Fat must be a number 0 or greater.");
+    } else if (!isValidPositiveNumber(fat)  || Number(fat) > 100) {
+      setFatErrorMessage("Fat must be between 0 and 100.");
     }
   };
 
@@ -124,9 +124,13 @@ export default function CustomFood() {
       !foodName.trim() ||
       foodName.trim().length > 120 ||
       !isValidPositiveNumber(calories) ||
+      Number(calories) > 2000 ||
       !isValidPositiveNumber(protein) ||
+      Number(protein) > 100 ||
       !isValidPositiveNumber(carbs) ||
-      !isValidPositiveNumber(fat)
+      Number(carbs) > 100 ||
+      !isValidPositiveNumber(fat) ||
+      Number(fat) > 100
     ) {
       return false;
     } else {
