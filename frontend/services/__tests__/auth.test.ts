@@ -59,7 +59,10 @@ describe("auth service", () => {
           password: "password123",
           display_name: "Test User",
         })
-      ).rejects.toThrow("Email is already taken");
+      ).rejects.toEqual({
+        code: "email_exists",
+        message: "Email is already taken",
+      });
     });
   });
 
@@ -96,7 +99,10 @@ describe("auth service", () => {
           email: "test@example.com",
           password: "wrongpassword",
         })
-      ).rejects.toThrow("Invalid email or password");
+      ).rejects.toEqual({
+        code: "invalid_credentials",
+        message: "Invalid email or password",
+      });
     });
   });
 });

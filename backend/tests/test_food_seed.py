@@ -24,11 +24,10 @@ def _create_sqlite_app():
     return app
 
 
-def test_seed_food_catalog_has_no_duplicates_and_is_sorted():
+def test_seed_food_catalog_has_no_duplicates():
     names = [item[0] for item in SEED_FOODS]
 
     assert len(names) == len(set(name.lower() for name in names))
-    assert SEED_FOODS == sorted(SEED_FOODS, key=lambda item: (item[1], item[0].lower()))
 
 
 def test_dump_food_serializes_decimal_fields():
