@@ -41,7 +41,7 @@ export default function Signup() {
   const activity = profile?.activity_level
     ? activityLevels.get(profile.activity_level)
     : "";
-  const tdee: number = profile?.tdee ?? 0;
+  const targetCalories: number = profile?.target_calories ?? 0;
   const age = profile?.age ? profile?.age.toString(): "";
   const gender = profile?.gender === 'female' ? "Female": "Male";
   const height = profile?.height_cm ? profile?.height_cm.toString(): "";
@@ -53,7 +53,7 @@ export default function Signup() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Text style={styles.leadText}>YOUR DAILY CALORIE NEED</Text>
-          <CircleResult calorie={tdee}></CircleResult>
+          <CircleResult calorie={targetCalories}></CircleResult>
           <Text style={styles.subText1}>
             To <Text style={{fontFamily: "PlusJakartaSans-Bold"}}>{goal}</Text> weight at a {activity} activity level.
           </Text>

@@ -14,7 +14,8 @@ jest.mock("expo-router", () => ({
 
 // Mock useAuth
 const mockProfile = {
-  tdee: 2200,
+  tdee: 2311,
+  target_calories: 1811,
   goal: "lose",
   activity_level: "moderate",
   age: 25,
@@ -39,7 +40,7 @@ describe("Result Screen", () => {
       await render(<ResultScreen />);
 
       expect(screen.getByText("YOUR DAILY CALORIE NEED")).toBeTruthy();
-      expect(screen.getByText("2,200")).toBeTruthy(); // formatted by CircleResult
+      expect(screen.getByText("1,811")).toBeTruthy(); // formatted by CircleResult
       expect(screen.getByText(/lose/)).toBeTruthy();
       expect(screen.getByText(/moderate/)).toBeTruthy();
 
