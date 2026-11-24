@@ -21,6 +21,9 @@ import { useRouter } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import { postCustomFood } from "../../services/food";
 
+const COMMA_ERROR_MESSAGE =
+  "Please use a dot (.) instead of a comma as decimal separator.";
+
 const screenWidth = Dimensions.get("window").width;
 export default function CustomFood() {
   const router = useRouter();
@@ -38,7 +41,7 @@ export default function CustomFood() {
 
   const isValidPositiveNumber = (val: string) => {
     const trimmed = val.trim();
-    if (!trimmed) return false;
+    if (!trimmed || trimmed.includes(",")) return false;
     const num = Number(trimmed);
     return !isNaN(num) && num >= 0;
   };
@@ -61,7 +64,9 @@ export default function CustomFood() {
 
   const handleCaloriesChange = (val: string) => {
     setCalories(val);
-    if (caloriesErrorMessage) {
+    if (val.includes(",")) {
+      setCaloriesErrorMessage(COMMA_ERROR_MESSAGE);
+    } else if (caloriesErrorMessage) {
       setCaloriesErrorMessage("");
     }
   };
@@ -69,6 +74,8 @@ export default function CustomFood() {
   const handleCaloriesBlur = () => {
     if (!calories.trim()) {
       setCaloriesErrorMessage("Calories cannot be empty.");
+    } else if (calories.includes(",")) {
+      setCaloriesErrorMessage(COMMA_ERROR_MESSAGE);
     } else if (!isValidPositiveNumber(calories) || Number(calories) > 2000) {
       setCaloriesErrorMessage("Calories must be between 0 and 2000.");
     }
@@ -76,7 +83,9 @@ export default function CustomFood() {
 
   const handleProteinChange = (val: string) => {
     setProtein(val);
-    if (proteinErrorMessage) {
+    if (val.includes(",")) {
+      setProteinErrorMessage(COMMA_ERROR_MESSAGE);
+    } else if (proteinErrorMessage) {
       setProteinErrorMessage("");
     }
   };
@@ -84,6 +93,8 @@ export default function CustomFood() {
   const handleProteinBlur = () => {
     if (!protein.trim()) {
       setProteinErrorMessage("Protein cannot be empty.");
+    } else if (protein.includes(",")) {
+      setProteinErrorMessage(COMMA_ERROR_MESSAGE);
     } else if (!isValidPositiveNumber(protein) || Number(protein) > 100) {
       setProteinErrorMessage("Protein must be between 0 and 100.");
     }
@@ -91,7 +102,9 @@ export default function CustomFood() {
 
   const handleCarbsChange = (val: string) => {
     setCarbs(val);
-    if (carbsErrorMessage) {
+    if (val.includes(",")) {
+      setCarbsErrorMessage(COMMA_ERROR_MESSAGE);
+    } else if (carbsErrorMessage) {
       setCarbsErrorMessage("");
     }
   };
@@ -99,14 +112,18 @@ export default function CustomFood() {
   const handleCarbsBlur = () => {
     if (!carbs.trim()) {
       setCarbsErrorMessage("Carbohydrates cannot be empty.");
-    } else if (!isValidPositiveNumber(carbs)  || Number(carbs) > 100) {
+    } else if (carbs.includes(",")) {
+      setCarbsErrorMessage(COMMA_ERROR_MESSAGE);
+    } else if (!isValidPositiveNumber(carbs) || Number(carbs) > 100) {
       setCarbsErrorMessage("Carbohydrates must be between 0 and 100.");
     }
   };
 
   const handleFatChange = (val: string) => {
     setFat(val);
-    if (fatErrorMessage) {
+    if (val.includes(",")) {
+      setFatErrorMessage(COMMA_ERROR_MESSAGE);
+    } else if (fatErrorMessage) {
       setFatErrorMessage("");
     }
   };
@@ -114,7 +131,9 @@ export default function CustomFood() {
   const handleFatBlur = () => {
     if (!fat.trim()) {
       setFatErrorMessage("Fat cannot be empty.");
-    } else if (!isValidPositiveNumber(fat)  || Number(fat) > 100) {
+    } else if (fat.includes(",")) {
+      setFatErrorMessage(COMMA_ERROR_MESSAGE);
+    } else if (!isValidPositiveNumber(fat) || Number(fat) > 100) {
       setFatErrorMessage("Fat must be between 0 and 100.");
     }
   };
@@ -123,12 +142,16 @@ export default function CustomFood() {
     if (
       !foodName.trim() ||
       foodName.trim().length > 120 ||
+      calories.includes(",") ||
       !isValidPositiveNumber(calories) ||
       Number(calories) > 2000 ||
+      protein.includes(",") ||
       !isValidPositiveNumber(protein) ||
       Number(protein) > 100 ||
+      carbs.includes(",") ||
       !isValidPositiveNumber(carbs) ||
       Number(carbs) > 100 ||
+      fat.includes(",") ||
       !isValidPositiveNumber(fat) ||
       Number(fat) > 100
     ) {

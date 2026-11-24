@@ -142,6 +142,66 @@ describe("CustomFood Screen", () => {
       await fireEvent(input, "blur");
       expect(screen.getByText("Fat must be between 0 and 100.")).toBeTruthy();
     });
+
+    it("displays validation error when calories contains a comma", async () => {
+      await render(<CustomFood />);
+      const input = screen.getByPlaceholderText("e.g. 250");
+
+      await fireEvent.changeText(input, "150,5");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+
+      await fireEvent(input, "blur");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+    });
+
+    it("displays validation error when protein contains a comma", async () => {
+      await render(<CustomFood />);
+      const input = screen.getByPlaceholderText("e.g. 10");
+
+      await fireEvent.changeText(input, "12,5");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+
+      await fireEvent(input, "blur");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+    });
+
+    it("displays validation error when carbs contains a comma", async () => {
+      await render(<CustomFood />);
+      const input = screen.getByPlaceholderText("e.g. 30");
+
+      await fireEvent.changeText(input, "25,3");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+
+      await fireEvent(input, "blur");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+    });
+
+    it("displays validation error when fat contains a comma", async () => {
+      await render(<CustomFood />);
+      const input = screen.getByPlaceholderText("e.g. 8");
+
+      await fireEvent.changeText(input, "5,5");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+
+      await fireEvent(input, "blur");
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
+    });
   });
 
   describe("Error Message Clearing", () => {
@@ -249,6 +309,23 @@ describe("CustomFood Screen", () => {
       expect(screen.getByText("Protein must be between 0 and 100.")).toBeTruthy();
       expect(screen.getByText("Carbohydrates must be between 0 and 100.")).toBeTruthy();
       expect(screen.getByText("Fat must be between 0 and 100.")).toBeTruthy();
+    });
+
+    it("halts submission when inputs contain a comma", async () => {
+      await render(<CustomFood />);
+
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g Homemade granola"), "Apple");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 250"), "150,5");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 10"), "10");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 30"), "20");
+      await fireEvent.changeText(screen.getByPlaceholderText("e.g. 8"), "2");
+
+      await fireEvent.press(screen.getByText("Save food"));
+
+      expect(foodService.postCustomFood).not.toHaveBeenCalled();
+      expect(
+        screen.getByText("Please use a dot (.) instead of a comma as decimal separator.")
+      ).toBeTruthy();
     });
   });
 
