@@ -91,7 +91,7 @@ export default function AddFood() {
     setIsLoading(true);
     const delayDebounceFn = setTimeout(() => {
       fetchSearchedFoods(trimmed, 50);
-    }, 600);
+    }, 1000);
 
     return () => clearTimeout(delayDebounceFn);
   }, [inputFood, fetchSearchedFoods]);
