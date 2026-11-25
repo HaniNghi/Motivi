@@ -27,7 +27,7 @@ def compute_targets(age: int, gender: str, height_cm, weight_kg, activity_level:
     if gender == "male":
         bmr = Decimal("10") * kg + Decimal("6.25") * cm - Decimal("5") * age_n + Decimal("5")
     else:
-        bmr = Decimal("10") * kg + Decimal("6.25") * cm - Decimal("5") * age_n + Decimal("5")
+        bmr = Decimal("10") * kg + Decimal("6.25") * cm - Decimal("5") * age_n - Decimal("161")
 
     tdee = bmr * ACTIVITY_MULTIPLIERS[activity_level]
     target = tdee + GOAL_ADJUSTMENTS[goal]
