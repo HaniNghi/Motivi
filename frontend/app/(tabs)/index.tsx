@@ -137,7 +137,7 @@ export default function Home() {
                   colors={colors.carbsGradient}
                 />
                 <BarIndicator
-                  text="Fats"
+                  text="Fat"
                   max={targetFat}
                   value={consumedFat}
                   colors={colors.fatsGradient}

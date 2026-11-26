@@ -72,7 +72,7 @@ export default function Profile() {
             <RowImageContent
               picLink={require("../../assets/fire.png")}
               first="Daily target"
-              second={`${profile?.tdee.toString()} kcal`}
+              second={`${profile?.target_calories.toString()} kcal`}
             />
             <RowImageContent
               picLink={require("../../assets/target.png")}
